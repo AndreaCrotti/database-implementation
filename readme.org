@@ -1,0 +1,2 @@
+[[file:exercises/][Exercises]] must be handled in every week.
+

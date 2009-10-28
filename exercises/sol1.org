@@ -1,0 +1,114 @@
+#+SETUPFILE: "db.org"
+
+SOL1
+* Terminology
+   - *Database*
+     A database is a collection of informations of logically related records consolidated in a common pool.
+     There are different ways to organizes the data, according to different /database models/.
+     The most common model used is the *relational model*, other models are for example *hierarchical model* or more recently the *object oriented model*.
+     
+   - *Database Management System*
+     A /database management system/ in general is a crucial software used to manage data sets.
+     It assists the DBA (database system administrator) to control how the data is organized and maintained on the storage structure.
+     It also gives access to the data to end users through communication protocols.
+
+     Common features required to a DBMS are for example
+     + Management of user permissions
+     + Creation / deletion / modification of tables
+     + insertion / selection of records
+       
+     There are many different kinds of DBMS, from simple embedded DBMS like sqlite to multi user and feature rich DBMS like for example Oracle.
+     Choosing one or the other depends also on the kind of data stored and who will need to access to those data.
+     
+   - *Database system*
+     A /database system/ is simply the combination of a DBMS and a database.
+
+   - *Physical Data Independence*
+     The ability of being independent about how the data is actually written on physical devices.
+     This is achieved simply by using the appropriate operating system systems calls, which already has the needed abstractions to write consistently on any kind of output device.
+
+   - *Logical Data Independence*
+     /Logical data independence/ gives the possibility to change arbitrarily the logical schema without affecting the application schema on top.
+     This is less easy to achieve than physical data independence but still very important.
+
+   - *Block and page*
+     Block and page are relative respectively to disks and ram.
+     A /page/ is a logical part of ram that is assigned to a certain process by the operating system.
+     A /block/ instead is a logical part (normally continuous) of the disk drive used to atomically read and write data.
+
+   - *Asynchronous I/O*
+     A widely used form of input/output processing that don't block the cpu while being executed.
+     This is very useful given that writing/reading to disks is extremely slower than working in the main memory or with the cache.
+
+   - *Blocking I/O*
+     Also called /synchronous I/O/, is simply the opposite of the asynchronous I/O.
+     In this case while a process demands a I/O resource no other processes can be executed, losing most of the computation power available in idle time.
+     
+   - *Block I/O*
+     A /block/ is a sequence of bit having a certain sizes.
+     Most disk devices are based on blocks, which are normally transferred (read and written) atomically from the disk.
+
+   - *Access path*
+     The /data access path/ is the path taken by the DBMS to retrieve our data object.
+     This should be as short as possible, and its length should be directly proportional to the importance of the data.
+     The more frequently a data object is accessed the shortest should be its access path.
+
+   - *Query*
+     A query is a mechanism to retrieve information from a database.
+     Most used language for querying is /SQL/ (Structured Query Language), which is standard.
+
+   - *Transaction*
+     A transaction is any single execution of a user program in a DBMS.
+     It is a sequence of operations on a database that can be grouped together.
+     A transaction has to be normally run atomically, that means that if we have an error in the middle of the transaction we have to /undo/ (*rollback*) the WHOLE transaction.
+
+* Buffer management
+   - *Why should be the DBMS in charge of buffering*
+     We could also let the operating system in charge of the buffering *but* the operating system is totally unaware of the transaction management.
+     Buffer management needs also to be portable and understand query specific data access patterns.
+     Also only the DBMS knows which pages are more likely to be requested in the future and choose the best policy to minimize the I/O operations.
+     
+   - *Benefits of copying their own pages out the buffer spool in long processing threads*
+     If a long processing thread fills the buffer spool all the other threads would be slowed down dramatically.
+     Copying out the pages to disk allows short threads to be executed while the buffer spool is not full.
+     This strategy adopted is similar to the one used by operating system's schedulers.
+     Batch processes get a lower priority to enable interactive programs to be executed quickly and give the user good response times.
+     
+   - *What to do in case average I/O consuming rate is much larger than disk reading rate?*
+     In this case the only solution is to increase some the disk reading rate.
+     Disk reading rate can be increased using faster disks or using different technologies.
+     For example putting two disks in a RAID0 configuration (/striping/) can increase a lot the performances.
+     
+* Database architecture
+   1. *Five layers of database architecture, concepts handled by them and interfaces between layers*
+     From the bottom to the top:
+     1. *Memory assignment structures*:
+	It Manages files and external memory, which means that it operates on the bit pattern stored on some external, non-volatile storage device.
+	Often in collaboration with the operating system's file management, this layer copes with the physical characteristics of each type of storage device.
+
+     2. *Page assignment*:
+	On the one hand, it introduces different types of pages which are fixed-length partitions of a linear address space and mapped into physical blocks which are, in turn, stored on external devices by the file management.
+	The strict distinction between pages and blocks offers additional degrees of freedom for the propagation of modified pages.
+	On the other hand, to effectively reduce the physical I/O, this layer provides for a DB buffer which acts as a page-oriented interface to the fraction of the DB currently resident in memory.
+
+     3. *Storage structure*:
+	It implements mapping functions much more complicated than those provided by the two subordinate layers.
+	For performance reasons, the partitioning of data into segments and pages is still visible at this layer.
+	It has to provide clustering facilities and maintain all physical object representations, like data records, fields, etc. as well as access path structures, such as B-trees, and internal catalog information.
+	It typically offers a variety of access paths of different types, which is named as Internal record interface, to the logical access layer. 
+
+     4. *Logical access structures*:
+	It Manages cursor, sort components and dictionary. It maps physical objects to their logical representations and vice versa.
+	At this interface, the modules at the next higher layer navigates through a hierarchy or network of logical records or along logical access paths using scans of various types.
+	A special ability is to dynamically order (sort) sets of records to support higher operations such as sort/merge joins.
+
+     5. *Logical data structures*:
+	Translate and optimize queries. It provides logical data structures (such as tables and views) with declarative operations or a non-procedural interface to the database.
+	At the API, it provides an access-path-independent data model with descriptive languages, like SQL.
+
+   2. *e b d a c*
+
+   3. Real DBMS don't fully implement all the five layers.
+      For example for many purposes even a *one layer architecture* is enough (like for example sqlite).
+      Increasing the number of layers also increases the complexity and can decrease the global performances of the DBMS.
+      
