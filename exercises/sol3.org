@@ -1,0 +1,29 @@
+#+SETUPFILE: "group.org"
+
+* TODO Exercise 3
+  DEADLINE: <2009-11-11 Mer>
+
+* 1) Recoverability
+** 1.
+   
+*** a)
+
+*** b)
+
+** 2.
+
+*** a)
+
+*** b)
+
+*** c)
+
+* 2) 2PL / S2PL / Deadlock handling
+  
+** 1.
+
+** 2.
+
+*** a)
+
+*** b)
