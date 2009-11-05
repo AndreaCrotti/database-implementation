@@ -1,4 +1,4 @@
-#+SETUPFILE: "db.org"
+#+SETUPFILE: "../db.org"
 
 SOL1
 * Terminology
