@@ -1,2 +1,2 @@
-#+AUTHOR:    Andrea Crotti (#299466), Can Liu (#286105), Sebastian Roidl (#)
+#+AUTHOR:    Andrea Crotti (#299466), Can Liu (#286105), Sebastian Roidl (#281941)
 #+OPTIONS:   num:nil toc:nil \n:t timestamp:nil todo:nil
