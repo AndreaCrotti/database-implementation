@@ -50,4 +50,36 @@
   Recovery properties are orthogonal to serializability.
 
   Under which conditions a schedule allows a *correct recovery of transactions*?
+
+** Recoverability
+  Every transaction will not be released, until all the other transactions from which it has read, are released
+  RC is the class of all recoverable schedules.
   
+** Avoidance of cascading aborts
+   A transaction is only allowed to read values from already successfully completed transactions.
+
+** Strictness
+   A schedule is strict, if an object is not read or overwritten, until the transction, which has written it at last, is terminated.
+
+** Rigorous schedules
+   A schedule is rigorous, if it is strict and no object x is overwritten, until all transactions, which have read x at last, are terminated
+
+* Concurrency Control Protocols
+  Techiques thanks to which the DBMS can generate correct schedules.
+  They can use locking mechanism or not.
+
+  We must consider
+  - Safety
+  - expressiveness
+  
+  
+** Locking scheduler
+   Applied for synchronization of accesses on same data objects.
+   
+   - rl(x) read lock
+   - wl(x) write lock
+     
+*** Two phase locking (2PL)
+    A locking protocol is /two phase/ if:
+    In the first phase of the transaction locks will only be set, in the second phase will only be removed.
+    
