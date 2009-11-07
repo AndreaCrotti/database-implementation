@@ -1,5 +1,7 @@
 #!/usr/bin/env/python
 
+import re
+
 
 class Schedule(object):
     """Possible schedule"""
@@ -19,36 +21,32 @@ class Schedule(object):
 
 
 class Operation(object):
-    locks = ['wu', 'wl', 'rl', 'rw']
-    rw = ['r', 'w']
-    act = ['a', 'c']
+    regexp = re.compile(r"""(?P<action>(wu|wl|rl|rw|r|w|a|c))(?P<index>\d+)(\[(?P<object>\w+)\])?""")
 
-    def __init__(self, op, idx, obj=None):
+    def __init__(self, operation):
         """ operator can only be read or write of course
         Possible operations are:
         - c[i] (commit)
         - a[i] (abort)
         - r_i[x] (read x)
         - w_i[x] (write on x)
+        - rl_i[x], ru_i[x], put/release read lock
+        - wl_i[x], wu_i[x], put/release write lock
         """
-        if op in ('r', 'w'):
-            if not(obj):
-                print "error, must also give the object"
-            else:
-                self.obj = obj
-
-        self.idx = idx
-        self.op = op
+        self.s = operation
+        self.op = self.parse_operation(operation)
 
     def __str__(self):
-        if self.op in ('a', 'c'):
-            return self.op + str(self.idx)
-        else:
-            return self.op + "_" + str(self.idx) + "[" + self.obj + "]"
+        return self.s
+
+    @staticmethod
+    def parse_operation(oper_str):
+        return Operation.regexp.match(oper_str).groupdict()
 
     def is_conflicting(self, other):
         " True if the two operations are in conflict "
-        return (self.obj == other.obj) and (self.op == "w" or other.op == "w")
+        return (self.op['object'] == other.op['object'])\
+               and (self.op['action'] == "w" or other.op['action'] == "w")
 
 
 def trans_to_op(s):

@@ -83,3 +83,11 @@
     A locking protocol is /two phase/ if:
     In the first phase of the transaction locks will only be set, in the second phase will only be removed.
     
+    - easy to implement
+    - good performances
+    - easy to distribute
+    - *not* deadlock free
+    - transactions may starve!
+    
+
+    

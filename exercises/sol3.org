@@ -6,24 +6,31 @@
 * 1) Recoverability
 ** 1.
    
-*** a)
+*** a) Every schedule belonging to avoid cascading abort (ACA) is also recoverable (RC)
 
-*** b)
+*** b) Each schedule that is strict is also in ACA
 
-** 2.
+** 2. Test if in RC, ACA, ST
 
-*** a)
+*** a) $s1 = r3(y) r1(x) w1(x) r2(x) c1 w3(y) w2(x) c3 c2$
 
-*** b)
+*** b) $s2 = r2(x) r3(y) w2(x) c2 r3(x) w3(x) c3 r1(x) w1(x) c1$
 
-*** c)
+*** c) $s3 = r1(x) w1(x) r3(x) w3(x) c3 r2(x) w2(x) c2 a1$
 
 * 2) 2PL / S2PL / Deadlock handling
   
-** 1.
+** 1. Prove that schedules produced by 2PL are conflict serializable.
 
-** 2.
+** 2. Given
+   s1 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) c2
+   s2 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) a2
+   s3 = r1(x) r2(x) w3(x) w4(x) w1(x) c1 w2(x) c2 c3 c4
 
-*** a)
 
-*** b)
+*** a) Compute the conflict graphs of the schedules above.
+    
+*** b) For each input schedule write down the corresponding schedule indicating the necessary locking (rl/wl) and unlocking (ru/wu) operations.
+    Write down the resulting output schedules for 2PL (transactions must unlock resources as soon as possible) and S2PL.
+    In case of a deadlock the transaction with the lowest index is aborted.
+    Once aborted, transactions are restarted anew at the end of the original schedule (abort- restart)
