@@ -1,2 +1,53 @@
-[[file:exercises/][Exercises]] must be handled in every week.
+* Serializability
+** Semantics of a schedule
+   Is computed using the Herbrand semantics.
 
+** Final State Serializability
+   Let $s$ and $s'$ be schedules, they are called *finite-state equivalent* if
+   $op(s) = op(s')$ and $H[s] = H[s']$ are valid.
+   Therefore $s \equiv s'$
+
+   We can't determine it by simply the last state but also by previous write operations.
+   
+   *Read from* relation is given when $p \rightarrow q$, so the action p is read in q.
+   An action p is /directly useful/ ($p \rightarrow q$) if q is read from p or p is read and q consecutive write action.
+   
+   Action is *alive* if it's useful for some other actions in the future.
+   
+   *Live-reads-from* relation 
+
+   FSR is the class of all /finite-state-serializable/ schedules.
+   But the test for inclusion in FSR has *exponential complexity*.
+
+*** TODO Try to implement the Herbrand semantic
+   
+** Conflicts
+   Two operators are in *conflict* if they operate on the same object and at least one is a write.
+   
+   $s$ and $s'$ are *conflict equivalent* if
+   - $op(s) = op(s')$
+   - $conf(s) = conf(s')$
+   
+   /Conflict serializable/ if a serial schedule exists with equivalent serializability.
+
+
+*** Serializability theorem:
+   It holds
+   $CSR \subset VSR \subset FSR$
+   We can then build a simple conflict graph and say that.
+   $s \in CSR \leftrightarrow G(s)$ is acyclic
+   
+   So we can check in polynomial time the conflict serializability.
+
+*** Order preserving conflict serializability
+    We can impose constraints on CSR imposing that some actions must be executed later.
+    An /ordering/ of the conflict order is sufficient for /conflict serializability/.
+		    
+
+
+* Transaction recovery
+  Serializability does not avoid synchronization problems between processes.
+  Recovery properties are orthogonal to serializability.
+
+  Under which conditions a schedule allows a *correct recovery of transactions*?
+  
