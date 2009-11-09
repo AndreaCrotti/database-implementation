@@ -47,16 +47,47 @@
 * 2) 2PL / S2PL / Deadlock handling
   
 ** 1. Prove that schedules produced by 2PL are conflict serializable.
+# To prove this you need to start from something generic generated from 2PL and find out that is conflict serializable.
 
 ** 2. Given
-   s1 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) c2
-   s2 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) a2
-   s3 = r1(x) r2(x) w3(x) w4(x) w1(x) c1 w2(x) c2 c3 c4
-
+   - s1 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) c2
+   - s2 = w1(x) r2(y) r1(x) c1 r2(x) w2(y) a2
+   - s3 = r1(x) r2(x) w3(x) w4(x) w1(x) c1 w2(x) c2 c3 c4
 
 *** a) Compute the conflict graphs of the schedules above.
+
+**** s1
+#+begin_dot s1.eps -Teps
+    digraph s1 {
+    t1;
+    t2;
+    }
+#+end_dot
+
+**** s2
+#+begin_dot s2.eps -Teps
+    digraph s1 {
     
+    }
+#+end_dot
+
+**** s3
+#+begin_dot s3.eps -Teps
+    digraph s3 {
+    t1 -> t3;
+    t1 -> t4;
+    t2 -> t3;
+    t2 -> t1;
+    t3 -> t2;
+    t4 -> t2;
+    }
+#+end_dot
+    Which is a cyclic graph, so s3 \notin CSR
+
+
 *** b) For each input schedule write down the corresponding schedule indicating the necessary locking (rl/wl) and unlocking (ru/wu) operations.
     Write down the resulting output schedules for 2PL (transactions must unlock resources as soon as possible) and S2PL.
     In case of a deadlock the transaction with the lowest index is aborted.
     Once aborted, transactions are restarted anew at the end of the original schedule (abort- restart)
+
+    
