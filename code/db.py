@@ -1,26 +1,60 @@
 #!/usr/bin/env/python
-
+# -*- mode: python -*-
 import re
+from itertools import count, groupby
+# import optparse
+# import sys
 
+
+s0 = "w1[x] r2[x] w2[y] r1[y] w1[y] w3[x] w3[y] c1 a2"
 
 class Schedule(object):
     """Possible schedule"""
 
-    def __init__(self, operations):
-        self.operations = operations
-
-    def conflicts(self):
-        """ Find possible conflicts """
-        # divide in possible partitions and return the couples colliding
-        confs = [(o, o1) for (o, o1) in (self.operations, self.operations)
-                 if o.is_conflicting(o1)]
-        return list(set(confs))
+    def __init__(self, sched_list):
+        self.operations = self.parse_schedule(sched_list)
+        # TODO: some function to sort operations by different parameters
 
     def __str__(self):
         return "\n".join([str(o) for o in self.operations])
 
+    def get_transactions(self):
+        " Returns the transactions found in the schedule"
+        return set([o['index'] for o in self.operations])
+
+    @staticmethod
+    def parse_schedule(sched_list):
+        "Parse a schedule which is in form \"op1 op2 op3...\""
+        return [ Operation(op) for op in sched_list.split(' ') ]
+
+    def conflicts(self):
+        """ Find possible conflicts """
+        # divide in possible partitions and return the couples colliding
+        # TODO: Add checking for aborted transactions
+        confs = []
+        num_ops = len(self.operations)
+        for idx in range(num_ops):
+            for jdx in range(idx + 1, num_ops):
+                o1, o2 = self.operations[idx], self.operations[jdx]
+                if o1.is_conflicting(o2):
+                    confs.append((o1,o2))
+        return confs
+
+    @staticmethod
+    def herbrand(index):
+        """
+        Get the herbrand semantics of the schedule,
+        better in a recursive way
+        H_s(ri(x)) = H_s(wj(x)) and wj(x) is the last write action before ri(x)
+        We must keep track of all writings, not just final value obtained
+        """
+        pass
+    
+    # Implement some possible schedulers which are CORRECT
+
 
 class Operation(object):
+    """ Representing a single operation """
     regexp = re.compile(r"""(?P<action>(wu|wl|rl|rw|r|w|a|c))(?P<index>\d+)(\[(?P<object>\w+)\])?""")
 
     def __init__(self, operation):
@@ -62,9 +96,3 @@ def str_to_op(s):
         return Operation(s[0], s[1], s[2])
 
 
-def herbrand(schedule):
-    pass
-
-
-def conflicts(schedule):
-    pass
