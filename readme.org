@@ -55,6 +55,8 @@
   Every transaction will not be released, until all the other transactions from which it has read, are released
   RC is the class of all recoverable schedules.
   
+  In other words we can say that if we read from another transaction we must make sure that the other transction does the commit before us.
+
 ** Avoidance of cascading aborts
    A transaction is only allowed to read values from already successfully completed transactions.
 
@@ -91,3 +93,4 @@
     
 
     
+      

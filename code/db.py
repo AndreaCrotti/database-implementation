@@ -1,5 +1,6 @@
 #!/usr/bin/env/python
 # -*- mode: python -*-
+# http://github.com/AndreaCrotti/database-implementation/blob/master/code/db.py
 import re
 from itertools import count, groupby
 # import optparse
@@ -37,8 +38,24 @@ class Schedule(object):
             for jdx in range(idx + 1, num_ops):
                 o1, o2 = self.operations[idx], self.operations[jdx]
                 if o1.is_conflicting(o2):
-                    confs.append((o1,o2))
+                    confs.append((o1, o2))
         return confs
+
+    def is_useful(self, act1, act2):
+        """ Check if act1 is useful for act2"""
+        pass
+
+    def is_alive(self, action):
+        """ Check if operation is alive """
+        pass
+
+    def lrf(self):
+        """ Computes live-reads-from relations """
+        pass
+
+    def read_from(self):
+        """ Computes the read from relations between transactions"""
+        pass
 
     @staticmethod
     def herbrand(index):
@@ -75,24 +92,12 @@ class Operation(object):
 
     @staticmethod
     def parse_operation(oper_str):
+        """ Parse the operation given regexp """
         return Operation.regexp.match(oper_str).groupdict()
 
     def is_conflicting(self, other):
         " True if the two operations are in conflict "
         return (self.op['object'] == other.op['object'])\
                and (self.op['action'] == "w" or other.op['action'] == "w")
-
-
-def trans_to_op(s):
-    " Takes a list of operations separated by ','"
-    return map(str_to_op, s.split(','))
-
-
-def str_to_op(s):
-    """ Converts a string to an operation, in form 'r1x' 'w3y' """
-    if len(s) == 2:
-        return Operation(s[0], s[1])
-    elif len(s) == 3:
-        return Operation(s[0], s[1], s[2])
 
 

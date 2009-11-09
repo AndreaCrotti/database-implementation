@@ -7,16 +7,42 @@
 ** 1.
    
 *** a) Every schedule belonging to avoid cascading abort (ACA) is also recoverable (RC)
+    Supposing that s fulfills the requirements for *ACA* and given that:
+    - a commit action must be always the last of the transaction
+    - reads x from t_j in s $\rightarrow c_j < r_i(x)$
+    
+    We directly have that also $c_j < c_i$, which is the requirement for RC.
+    So $s \in ACA \rightarrow s \in RC$
 
 *** b) Each schedule that is strict is also in ACA
+    
 
 ** 2. Test if in RC, ACA, ST
 
-*** a) $s1 = r3(y) r1(x) w1(x) r2(x) c1 w3(y) w2(x) c3 c2$
 
-*** b) $s2 = r2(x) r3(y) w2(x) c2 r3(x) w3(x) c3 r1(x) w1(x) c1$
+*** a) s1 = r3(y) r1(x) w1(x) r2(x) c1 w3(y) w2(x) c3 c2
+    - *RC*
+      Yes, t2 reads from t1 and c1 < c2
 
-*** c) $s3 = r1(x) w1(x) r3(x) w3(x) c3 r2(x) w2(x) c2 a1$
+    - *ACA*
+      No, t2 reads from t1 but c1 > r2(x).
+      In case of abort of the transaction t1 we could still have problems here.
+      So it's also not *ST*
+
+*** b) s2 = r2(x) r3(y) w2(x) c2 r3(x) w3(x) c3 r1(x) w1(x) c1
+    - *RC*
+      Yes, t3 reads from t2 and c2 < c3, t1 reads from t3 and c3 < c1
+
+    - *ACA*
+      Yes, t3 reads from t2 and c2 < r3(x), t1 reads from t3 and c3 < r1(x)
+
+    - *ST*
+      Yes, we can check easily that after every write of w_i(x) we have a c_i, there are no writes or reads of /x/ between last write and commit.
+
+*** c) s3 = r1(x) w1(x) r3(x) w3(x) c3 r2(x) w2(x) c2 a1
+    - *RC*
+      No, because t3 reads from t1 but there is not a commit c1.
+      So as logical consequence s3 it's not also *ACA* or *ST*
 
 * 2) 2PL / S2PL / Deadlock handling
   
