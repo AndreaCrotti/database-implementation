@@ -57,7 +57,6 @@
    - s3 = r1(x) r2(x) w3(x) w4(x) w1(x) c1 w2(x) c2 c3 c4
      
 *** a) Compute the conflict graphs of the schedules above.
-
 **** s1
 #+BEGIN_SRC dot :file s1.pdf :cmdline -Tpdf :exports none :results silent
     digraph s1 {
@@ -100,20 +99,22 @@
 *** b) For each input schedule write down the corresponding schedule indicating the necessary locking (rl/wl) and unlocking (ru/wu) operations.
     Write down the resulting output schedules for 2PL (transactions must unlock resources as soon as possible) and S2PL.
     In case of a deadlock the transaction with the lowest index is aborted.
-    Once aborted, transactions are restarted anew at the end of the original schedule (abort- restart)
+    Once aborted, transactions are restarted as new at the end of the original schedule (abort- restart)
 
     
 **** s1
-     - *2PL:*
-       wl1(x) w1(x) wu1(x) r1(x) c1 rl2(y) wl2(y) r2(y) ru2(y) r2(x) ru2(x) wu2(y) c2
-     - *S2PL:*
-       
+     - *2PL:*\newline
+       wl1(x) w1(x) wu1(x) r1(x) c1 rl2(y) wl2(y) r2(y) ru2(y) r2(x) wu2(y) c2
+     - *S2PL:* \newline
+       We just need to move the unlockings to the end of the transaction \newline
+       wl1(x) w1(x) r1(x) wu1(x) c1 rl2(y) wl2(y) r2(y) r2(x) ru2(y) wu2(y) c2
 
 **** s2
      - *2PL:*
 #       In this case we can cut the aborted actions,
        wl1(x) w1(x) r1(x) wu1(x) c1
-
+     - *S2PL:*
+       wl1(x) w1(x) r1(x) wu1(x) c1
+       
 **** s3
-     - *2PL:*
-       There are not possible scheduling, the conflict graph is not acyclic.
+     No possible schedulings for 2PL or S2PL given that the conflicts graph is acyclic.
