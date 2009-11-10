@@ -77,12 +77,16 @@
   
 ** Locking scheduler
    Applied for synchronization of accesses on same data objects.
+   For a schedule s a DT(s) it the projection of s on the actions of type "a,c,r,w".
+   (removing the locking and unlocking operations).
+   
    
    - rl(x) read lock
    - wl(x) write lock
      
 *** Two phase locking (2PL)
     A locking protocol is /two phase/ if:
+    After the first unlocking operation, locking can't be set anymore.
     In the first phase of the transaction locks will only be set, in the second phase will only be removed.
     
     - easy to implement
