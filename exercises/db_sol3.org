@@ -75,13 +75,19 @@
 #+begin_dot s3.eps -Teps
     digraph s3 {
     t1 -> t3;
+    t1 -> t2;
     t1 -> t4;
     t2 -> t3;
     t2 -> t1;
+    t3 -> t1;
     t3 -> t2;
+    t3 -> t4;
     t4 -> t2;
+    t4 -> t1;
     }
 #+end_dot
+    
+
     Which is a cyclic graph, so s3 \notin CSR
 
 
