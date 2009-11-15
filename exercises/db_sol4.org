@@ -1,0 +1,35 @@
+EXERCISE 4
+#+SETUPFILE: "group.org"
+
+* TODO EXERCISE 4
+  DEADLINE: <2009-11-18 Mer>
+  
+* 1. Concurrency Control in B+-Trees
+** 1.  Search the data entry 35*
+   
+** 2. Search for all data entries k*
+
+** 3. Insert data entry 60*
+
+** 4. Delete data entry 20*
+
+** 5. Insert data entries 60* and 75*
+
+* 2. Multiple-Granularity Locking
+** 1. Read record P1200 : 5.
+   
+** 2. Read records P1200 : 98 through P1205 : 2.
+   
+** 3. Read all (records on all) pages in file F1.
+   
+** 4. Read pages P500 through P520.
+   
+** 5. Read pages P10 through P980.
+   
+** 6. Read all pages in F1 and (based on the values read) modify 10 pages.
+   
+** 7. Delete record P1200 : 98. (This is a blind write.)
+   
+** 8. Delete the first record from each page. (Again, these are blind writes.)
+   
+** 9. Delete all records.

@@ -2,7 +2,7 @@
 # -*- mode: python -*-
 # http://github.com/AndreaCrotti/database-implementation/blob/master/code/db.py
 import re
-from itertools import count, groupby
+from itertools import groupby
 # import optparse
 # import sys
 
