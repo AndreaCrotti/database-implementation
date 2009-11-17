@@ -24,7 +24,7 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
 
 ** 2. Search for all data entries k* with k* < 35
    For convenience of typing when we write:
-   /<op> <obj1> <obj2>/ ... means the we can apply the operator in parallel, then equivalent to /op(obj1), op(obj2).../
+   /<op> <obj1> <obj2>/ ... means the we can apply the operator in parallel, then equivalent to /op(obj1), op(obj2)... /
 
    Here we need to read all the data from the left sibling and left child of node B.
    - rl A
@@ -34,15 +34,18 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    - rul B, J
    - rl M, N, O, P, G, H
    - rul K, L, F
+   - r M, N, O, P, G, H
+   - rul M, N, O, P, G, H
    
-   At this point we can read all the leaf nodes where the index k* < 35 (and unlock them after read of course).
-
 ** 3. Insert data entry 60*
    Here we see that E is not full, so we can just insert our node there.
    But we don't know if the node is actually safe until we reach the end and see it's half empty.
 
    Therefore it should be:
    - wl A
+# Not very sure it works like that, in the simple tree locking
+# we can't unlock until we're sure that the node is safe
+# and we only know it in the leaf node
    - wl B => B is safe,
    - wul A
    - wl C
@@ -50,15 +53,31 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    - wul C, B
    - write 60* in E
    - wul E
+     
+# given that we always lock from root to leaf and unlock
+# from leaf to root
+# I think it should be
+   - wl B
+   - wl C
+   - wl E => E is safe, so
+   - w E
+   - wul E
+   - wul C
+   - wul B
+   - wul A
 
 ** 4. Delete data entry 20*
    - wl A
    - wl B 
    - wl F 
    - wl G => G is safe, as it contains more than k*/2 values (k* is obviously =1)
-   - wul A,B,F
+# here better write sequentially, unlocking can't be parallelised in this case
+# before doing the operation on the leaf and only then releasing the parents
    - delete 20* from G
    - wul G
+   - wul F
+   - wul B
+   - wul A
 
 ** 5. Insert data entries 60* and 75*
 *** Insert 60* 
