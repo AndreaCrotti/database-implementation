@@ -37,34 +37,21 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    - r M, N, O, P, G, H
    - rul M, N, O, P, G, H
    
+#<<1.3>>
 ** 3. Insert data entry 60*
    Here we see that E is not full, so we can just insert our node there.
    But we don't know if the node is actually safe until we reach the end and see it's half empty.
 
    Therefore it should be:
    - wl A
-# Not very sure it works like that, in the simple tree locking
-# we can't unlock until we're sure that the node is safe
-# and we only know it in the leaf node
    - wl B => B is safe,
    - wul A
    - wl C
    - wl E  => E is safe, so:
-   - wul C, B
+   - wul C 
+   - wul B
    - write 60* in E
    - wul E
-     
-# given that we always lock from root to leaf and unlock
-# from leaf to root
-# I think it should be
-   - wl B
-   - wl C
-   - wl E => E is safe, so
-   - w E
-   - wul E
-   - wul C
-   - wul B
-   - wul A
 
 ** 4. Delete data entry 20*
    - wl A
@@ -73,15 +60,16 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    - wl G => G is safe, as it contains more than k*/2 values (k* is obviously =1)
 # here better write sequentially, unlocking can't be parallelised in this case
 # before doing the operation on the leaf and only then releasing the parents
-   - delete 20* from G
-   - wul G
    - wul F
    - wul B
    - wul A
+   - delete 20* from G
+   - wul G
 
 ** 5. Insert data entries 60* and 75*
 *** Insert 60* 
-       - see 1.3
+    See [[1.3]]
+
 *** now insert 75*
     - wl A
     - wl B, B is safe =>
@@ -96,7 +84,6 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
     - wul B, C1, C2, E1, E2
 
 * 2. Multiple-Granularity Locking
-[seb]
 ** 1. Read record P1200 : 5.
  - irl (D)
  - irl (F2)
@@ -148,4 +135,3 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
 ** 9. Delete all records.
 
  - wl (D)
-[/seb]
