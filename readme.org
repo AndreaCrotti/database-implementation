@@ -95,6 +95,12 @@
     - *not* deadlock free
     - transactions may starve!
     
-
-    
-      
+*** MGL
+    We need *intentional locks*.
+    The idea is for a transaction to indicate, along the path, what locks will require in some of the possible paths.
+    - irl:
+      a read lock will be requested
+    - iwl:
+      a write lock will be requested
+    - riwl:
+      current node is read locked but also a write lock will be requested later.
