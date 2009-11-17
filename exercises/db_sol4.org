@@ -1,15 +1,37 @@
 EXERCISE 4
-#+SETUPFILE: "group.org"
+#+SETUPFILE: group.org
 
 * TODO EXERCISE 4
   DEADLINE: <2009-11-18 Mer>
   
 * 1. Concurrency Control in B+-Trees
-** 1.  Search the data entry 35*
+** 1. Search the data entry 35*
+   For searching we only need to go deeper in the tree, read lock child and unlock parent iteratively.
+   So we:
+   - rl A
+   - rl B
+   - rul A
+   - rl C
+   - rul B
+   - rl D
+   - rul C
+   And we're done now we can read the value from the key 38 and unlock it
+
+** 2. Search for all data entries k* with k* < 35
+   Here we need to read all the data from the left sibling and left child of node B.
+   - rl A
+   - rl B, J (in parallel? can I write it like that?)
+   - rl F, K, L
+   - rul B, J
+   - rl M, N, O, P, G, H
+   - rul K, L, F
    
-** 2. Search for all data entries k*
+   At this point we can read all the leaf nodes where the index k* < 35 (and unlock them after read of course).
 
 ** 3. Insert data entry 60*
+   Here we see that E is not full, so we can just insert our node there.
+   But we don't know if the node is actually safe until we reach the end and see it's half empty.
+   
 
 ** 4. Delete data entry 20*
 
