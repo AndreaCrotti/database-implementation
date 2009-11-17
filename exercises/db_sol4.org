@@ -77,20 +77,56 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
     - wul B, C1, C2, E1, E2
 
 * 2. Multiple-Granularity Locking
+[seb]
 ** 1. Read record P1200 : 5.
+ - irl (D)
+ - irl (F2)
+ - irl (P1200)
+ - rl (P1200:5)
    
 ** 2. Read records P1200 : 98 through P1205 : 2.
+ - irl (D)
+ - irl (F2)
+ - rl (P1200 - P1205) 
    
 ** 3. Read all (records on all) pages in file F1.
+ - irl (D)
+ - rl (F1)
    
 ** 4. Read pages P500 through P520.
-   
+ - irl (D)
+ - irl (F1)
+ - rl (500)...rl(520)
+
 ** 5. Read pages P10 through P980.
+ - irl (D)
+ - rl (F1)
    
 ** 6. Read all pages in F1 and (based on the values read) modify 10 pages.
+
+ - riwl (D)
+ - riwl (F1)
+ - wl on that 10 pages
    
 ** 7. Delete record P1200 : 98. (This is a blind write.)
+
+ - iwl (D)
+ - iwl (F2)
+ - iwl (P1200)
+ - wl (P1200:98)
    
 ** 8. Delete the first record from each page. (Again, these are blind writes.)
+ - wl (D) => As there a lot of pages, creating a wl for every single one would cause a lot of overhead! 
+-- in case thats not a problem, we could also use:
+
+ - iwl (D)
+ - iwl (F1)
+ - iwl (F2)
+ - iwl on all pages
+ - wl on the first record of each page
+
    
 ** 9. Delete all records.
+
+ - wl (D)
+[/seb]
