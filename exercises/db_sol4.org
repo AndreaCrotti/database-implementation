@@ -17,10 +17,13 @@ EXERCISE 4
    - rul C
    And we're done now we can read the value from the key 38 and unlock it
 
+[sebastian] -> we`re looking for 35*, therefore we should rl the I-Key and read the value from 35* ?! [/seb]
+
 ** 2. Search for all data entries k* with k* < 35
    Here we need to read all the data from the left sibling and left child of node B.
    - rl A
    - rl B, J (in parallel? can I write it like that?)
+[seb] I didn`t attend the lecture and the slides are not specific. But I guess its possible [/seb]
    - rl F, K, L
    - rul B, J
    - rl M, N, O, P, G, H
@@ -31,11 +34,47 @@ EXERCISE 4
 ** 3. Insert data entry 60*
    Here we see that E is not full, so we can just insert our node there.
    But we don't know if the node is actually safe until we reach the end and see it's half empty.
-   
+   [seb] therefore it should be:
+  
+   - wl A
+   - wl B => B is safe,
+   - wul A
+   - wl C
+   - wl E  => E is safe, so:
+   - wul C, B
+   - write 60* in E
+   - wul E
+[/seb]
 
 ** 4. Delete data entry 20*
+[seb]
+  - wl A
+  - wl B 
+  - wl F 
+  - wl G => G is safe, as it contains more than k*/2 values (k* is obviously =1)
+  - wul A,B,F
+  - delete 20* from G
+  - wul G
+[/seb]
+
 
 ** 5. Insert data entries 60* and 75*
+[seb]
+ *** Insert 60* 
+       - see 1.3
+ *** now insert 75*
+ - wl A
+ - wl B, B is safe =>
+ - wul A
+ - wl C
+ - wl E
+ - insert 75* in E => overflow
+ - split E into E1 {44*,60*} and E2 {75*}. propagate insert to C
+ - insert 75* in C => overflow
+ - split C into C1 {38,44} and C2 {75}. propagate insert to B
+ - insert 75 into B
+ - wul B, C1, C2, E1, E2
+[/seb]
 
 * 2. Multiple-Granularity Locking
 ** 1. Read record P1200 : 5.
