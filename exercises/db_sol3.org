@@ -1,8 +1,8 @@
 EXERCISE 3
 #+SETUPFILE: "group.org"
 
-* TODO Exercise 3
-  DEADLINE: <2009-11-11 Mer>
+* DONE Exercise 3
+  DEADLINE: <2009-11-11 Mer> CLOSED: [2009-11-17 Mar 16:15]
 
 * 1) Recoverability
 ** 1. Prove the following

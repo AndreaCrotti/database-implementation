@@ -1,26 +1,22 @@
 EXERCISE 4
 #+SETUPFILE: group.org
 
-* TODO EXERCISE 4
-  DEADLINE: <2009-11-18 Mer>
+* DONE EXERCISE 4
+   DEADLINE: <2009-11-18 Mer> CLOSED: [2009-11-18 Mer 11:40]
   
-* 1. Concurrency Control in B+-Trees
+* 1. Concurrency Control in B_{+}Trees
 ** 1. Search the data entry 35*
    For searching we only need to go deeper in the tree, read lock child and unlock parent iteratively.
    So we:
    - rl A
    - rl B
-   - rul A
+   - ru A
    - rl C
-   - rul B
-   - rl D
-   - rul C
-   - r D
-   - rul D
-     
-   And we're done now we can read the value from the key 38 and unlock it
-
-We're looking for 35*, therefore we should rl the I-Key and read the value from 35* ?!
+   - ru B
+   - rl I
+   - ru C
+   - r I
+   - ru I
 
 ** 2. Search for all data entries k* with k* < 35
    For convenience of typing when we write:
@@ -29,42 +25,41 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    Here we need to read all the data from the left sibling and left child of node B.
    - rl A
    - rl B, J
-#[seb] I didn`t attend the lecture and the slides are not specific. But I guess its possible [/seb]
+   - ru A
    - rl F, K, L
-   - rul B, J
+   - ru B, J
    - rl M, N, O, P, G, H
-   - rul K, L, F
+   - ru F, K, L
    - r M, N, O, P, G, H
-   - rul M, N, O, P, G, H
+   - ru M, N, O, P, G, H
    
 #<<1.3>>
 ** 3. Insert data entry 60*
    Here we see that E is not full, so we can just insert our node there.
    But we don't know if the node is actually safe until we reach the end and see it's half empty.
 
-   Therefore it should be:
    - wl A
    - wl B => B is safe,
-   - wul A
+   - wu A
    - wl C
    - wl E  => E is safe, so:
-   - wul C 
-   - wul B
+   - wu C 
+   - wu B
    - write 60* in E
-   - wul E
+   - wu E
 
 ** 4. Delete data entry 20*
    - wl A
    - wl B 
    - wl F 
-   - wl G => G is safe, as it contains more than k*/2 values (k* is obviously =1)
+   - wl G => G is safe, as it contains more than k*/2 values (k* is obviously = 2)
 # here better write sequentially, unlocking can't be parallelised in this case
 # before doing the operation on the leaf and only then releasing the parents
-   - wul F
-   - wul B
-   - wul A
+   - wu F
+   - wu B
+   - wu A
    - delete 20* from G
-   - wul G
+   - wu G
 
 ** 5. Insert data entries 60* and 75*
 *** Insert 60* 
@@ -73,7 +68,7 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
 *** now insert 75*
     - wl A
     - wl B, B is safe =>
-    - wul A
+    - wu A
     - wl C
     - wl E
     - insert 75* in E => overflow
@@ -81,7 +76,7 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
     - insert 75* in C => overflow
     - split C into C1 {38,44} and C2 {75}. propagate insert to B
     - insert 75 into B
-    - wul B, C1, C2, E1, E2
+    - wu B, C1, C2, E1, E2
 
 * 2. Multiple-Granularity Locking
 ** 1. Read record P1200 : 5.
@@ -120,7 +115,7 @@ We're looking for 35*, therefore we should rl the I-Key and read the value from 
    - riwl (F1)
 # not sure here, in theory we should I think read lock before, unlock and then lock those pages
    - rl(P1 - P1000)
-   - rul(P1 - P1000)
+   - ru(P1 - P1000)
 # now I have the value and can decide what to lock
    - wl on that 10 pages
 
