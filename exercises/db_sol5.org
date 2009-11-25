@@ -59,19 +59,56 @@ EXERCISE 5
   DPT and active transactions are then useful to see what must be done later.
 
 ** 1. What is done during Analysis after the first restart? (Be precise about the points at which Analysis begins and ends and describe the contents of any tables constructed in this phase.)
+   *** Begins at LSN 1 and ends at LSN 10
+   *** Tables constructed are: The Dirty Page Table (DPT) and the Transaction Table.
+   *** Dirty Page Table contains:
+
+ | pageID | recLSN |
+ |--------+--------|
+ | P1     |  2     |
+ | P2     |  3     |
+ | P3     |  6     |
+ | P5     |  9     |
+
+ *** Transaction Table contains:
+
+  | transID | lastLSN | status |
+  |---------+---------+--------|
+  |    T1   |  9      |  U     |
+  |    T3   |  10     |  U     |
    
 ** 2. What is done during Redo after the first restart? (Be precise about the points at which Redo begins and ends.)
 
+ *** Redo begins at the oldest LSN found in the DPT, so in this case its LSN 2 and ends at LSN 10
+ *** Redo is now rewriting all updates or CLRs, meaning : LSN 2,3,6,7,9
+
 ** 3. What is done during Undo between the first restart and the second restart? (Be precise about the points at which Undo begins and ends.)
 
+ *** Undo begins at LSN 10, undoing all Transactions which have the status U in the transaction table.
+  **** write CLR for LSN 9 in LSN 11
+  **** write CLR for LSN 7 in LSN 12
+ *** now the system crashes again.
+
 ** 4. What is the log at the beginning of the second restart? What is done during Analysis after the second restart?
+  *** everything´s the same plus LSN 11 containing a CLR for LSN 9 and LSN 12 containing a CLR for LSN 7.
 
 ** 5. What is done during Redo after the second restart?
+  *** All that has been done in the first redo plus:
+  *** Redoing the two CLRs, meaning the pages affected by the CLR (so the the undo-process) are set to the value of the CLR and therefore completing the undoing process, in case the CLR was not written to the disk.
 
 ** 6. What is done during Undo between the second restart and the third restart?
+ *** Going on with the undo (beginning at LSN 6): 
+ **** write CLR for LSN 6 in LSN 13 
+ **** write CLR for LSN 3 in LSN 14
 
 ** 7. What is the log at the beginning of the third restart? What is done during Analysis after the third restart?
+ *** see old table plus entries of 3) and 6) .
+ *** Analysis starts at LSN 1 again doing the same as in first analysis. The new CLR records will be added to the Dirty Page Table 
 
 ** 8. What is done during Redo of the third restart?
+ *** Redoing everything like first Redo, starting at LSN 1 and also including the new CLRs.
 
 ** 9. What is done during Undo of the third restart?
+  *** Now the undoing can be finished (we`ve already undone all necessery records except for LSN 1. So there´s another CLR written to the log conatining the LSN 1. 
+  *** Now the set of LSNs to be undone is empty and the undoing process is finished.
+ *** Note that T2 was not undone as it was committed and ended during the Redo-process.
