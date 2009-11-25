@@ -13,7 +13,6 @@ EXERCISE 5
    In some cases though it could be safe to lower the isolation level and get more performances due to an increased concurrency level.
    
    As we can see below the case of *read-only* access mode is actually equivalent to *read-write* case, just removing the possibility to acquire read locks on the resources.
-# Same question was last year slide 8.
 
    |--------------+------+-----------------------------------------------------------------------------|
    | LEVEL        | MODE | SCHEDULER                                                                   |
@@ -109,6 +108,6 @@ EXERCISE 5
    - Redoing everything like first Redo, starting at LSN 1 and also including the new CLRs.
 
 ** 9. What is done during Undo of the third restart?
-  - Now the undoing can be finished (we've already undone all necessary records except for LSN 1. So there´s another CLR written to the log containing the LSN 1. 
+  - Now the undoing can be finished (we've already undone all necessary records except for LSN 1. So there is another CLR written to the log containing the LSN 1. 
   - Now the set of LSNs to be undone is empty and the undoing process is finished.
   - Note that T2 was not undone as it was committed and ended during the Redo-process.
