@@ -1,0 +1,41 @@
+EXERCISE 6
+#+SETUPFILE: group.org
+#+STARTUP: showall
+
+* TODO 
+ DEADLINE: <2009-12-02 Mer 12:15>
+
+* 1. Selection and projection
+** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases?
+   Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
+
+*** (a) with a clustered b-tree of height 3 (matching records are located in one page)
+
+*** (b) without any index, nor is the file sorted on the attribute occurring in selection
+
+*** (c) with an unclustered b-tree index of height 3, and there are 10 matching records
+
+*** (d) with an unclustered b-tree of height 3 and one tenth of the records match the selection
+
+** 2. We assume the relation is of N pages.
+*** (a) What is the complexity of sorting-based projection?
+
+*** (b) If the records are distributed uniformly, what is the complexity for hash-based projection?
+
+*** (c) Why is sorting-based projection the standard solution in practice (or why is it superior to hash-based projection)?
+
+* 2. Join
+
+** 1. What is the cost of joining Order and Customer using a page-oriented simple nested loops join?
+
+** 2. What is the cost of joining Order and Customer using a block nested loops join?
+
+** 3. What is the cost of joining Order and Customer using a sort-merge join?
+
+** 4. What is the cost of joining Order and Customer using a hash join?
+
+** 5. If un clustered B+−tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
+
+** 6. Reconsider the question above when the B+ − tree index is clustered.
+
+
