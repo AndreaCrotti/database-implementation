@@ -50,7 +50,9 @@ EXERCISE 6
     Since in this case the join is page-oriented, the cost is:
     M+M*N=1000+1000*200=2*10power5 I/Os
 ** 2. What is the cost of joining Order and Customer using a block nested loops join?
-
+    One buffer page is for scanning inner Customer, so we use (52-2) buffer pages for holding the blocks of outer  Order. 
+    The cost is:
+    M+[M/(B-2)]*N = 1000+[1000/50]*200=5000 I/Os
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
 
 ** 4. What is the cost of joining Order and Customer using a hash join?
