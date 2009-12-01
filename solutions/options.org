@@ -1,2 +1,3 @@
 #+AUTHOR:    Andrea Crotti (#299466), Can Liu (#286105), Sebastian Roidl (#281941)
 #+OPTIONS:   num:nil toc:nil timestamp:nil todo:nil timestamp:nil
+#+STARTUP:   showall

@@ -1,17 +1,22 @@
 EXERCISE 6
-#+SETUPFILE: group.org
-#+STARTUP: showall
+#+SETUPFILE: options.org
 
 * TODO 
  DEADLINE: <2009-12-02 Mer 12:15>
 
 * 1. Selection and projection
-** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases?
-   Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
+** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases? Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
+   
+   In general equality selection must be done scanning the the whole data and checking over the key we need to compare.
+   Using indexes or (un)clustered B+Trees can reduce the I/O costs of operations.
+   Here we have 20 records for B-tree and 10 records for each page, this means that we can't store the whole B-tree in one page, but they can span over more pages.
+   The number of matching records should not influence the 
 
 *** (a) with a clustered b-tree of height 3 (matching records are located in one page)
+    This is the best case we can have, a clustered B^{+}-Tree records all the data in a sorted order on disk.
 
 *** (b) without any index, nor is the file sorted on the attribute occurring in selection
+    This is the worst possible case, we need to scan 
 
 *** (c) with an unclustered b-tree index of height 3, and there are 10 matching records
 

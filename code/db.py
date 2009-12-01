@@ -2,10 +2,7 @@
 # -*- mode: python -*-
 # http://github.com/AndreaCrotti/database-implementation/blob/master/code/db.py
 import re
-from itertools import groupby
-# import optparse
-# import sys
-
+import sqlite3
 
 s0 = "w1[x] r2[x] w2[y] r1[y] w1[y] w3[x] w3[y] c1 a2"
 
@@ -99,5 +96,6 @@ class Operation(object):
         " True if the two operations are in conflict "
         return (self.op['object'] == other.op['object'])\
                and (self.op['action'] == "w" or other.op['action'] == "w")
+
 
 
