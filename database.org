@@ -104,3 +104,8 @@
       a write lock will be requested
     - riwl:
       current node is read locked but also a write lock will be requested later.
+
+* Implementation
+  
+** Clustered relation
+   A relation is /clustered/ if its tuples are packed into roughly as few blocks as possibly hold those tuples.

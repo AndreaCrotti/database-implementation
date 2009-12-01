@@ -8,12 +8,15 @@ EXERCISE 6
 ** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases? Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
    
    In general equality selection must be done scanning the the whole data and checking over the key we need to compare.
-   Using indexes or (un)clustered B+Trees can reduce the I/O costs of operations.
+   Using indexes or (un)clustered B+Trees can reduce the number of I/O operations.
    Here we have 20 records for B-tree and 10 records for each page, this means that we can't store the whole B-tree in one page, but they can span over more pages.
    The number of matching records should not influence the number of I/O operations needed.
 
+   When relations are not clustered it takes $T(R)$ I/Os instead of $B(R)$ I/Os to read all the tuples in R.
+
 *** (a) with a clustered b-tree of height 3 (matching records are located in one page)
-    This is the best case we can have, a clustered B^{+}-Tree records all the data in a sorted order on disk.
+    This is the best possible scenario, a clustered B^{+}-Tree records all the data in a sorted order on disk.
+    
 
 *** (b) without any index, nor is the file sorted on the attribute occurring in selection
     This is the worst possible case, we need to scan over all the records and check the equality of the attribute.
@@ -21,18 +24,27 @@ EXERCISE 6
 
 *** (c) with an unclustered b-tree index of height 3, and there are 10 matching records
     Looking up the index is much cheaper than scanning the whole set of records.
-    Here we can use the index on that attribute
+    Here we can use the index on that attribute and then fetch the corresponding page.
 
 *** (d) with an unclustered b-tree of height 3 and one tenth of the records match the selection
+    
     
 ** 2. We assume the relation is of N pages.
 
 *** (a) What is the complexity of sorting-based projection?
+    When doing a /projection/ we must
+    - remove unnecessary attributes
+    - delete all the possible duplicates that we generated
+    If we use a sorting-based algorithm then all the duplicates can only be adjacent, and it becomes very easy to detect and delete them.
+    The complexity is then $O(M \log{M})$, where for M we denote the number of pages.
     
-
 *** (b) If the records are distributed uniformly, what is the complexity for hash-based projection?
+    Uniformity is a good thing for hashing, it allows to define less "indexes".
 
 *** (c) Why is sorting-based projection the standard solution in practice (or why is it superior to hash-based projection)?
+    External sorting is quite efficient and we can also modify it to have an even more efficient projection.
+    In general the cost is $O(M \log{M})$
+    /hash-based/ projections introduce more complexity and don't give any.
 
 * 2. Join
   Consider $Order \Join_{Order.cid=Customer.id} Customer$.
