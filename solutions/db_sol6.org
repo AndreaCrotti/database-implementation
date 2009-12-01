@@ -65,9 +65,12 @@ EXERCISE 6
 ** 2. What is the cost of joining Order and Customer using a block nested loops join?
     One buffer page is for scanning inner Customer, so we use (52-2) buffer pages for holding the blocks of outer  Order. 
     The cost is:
-    M+[M/(B-2)]*N = 1000+[1000/50]*200=5000 I/Os
+    M + [M / (B - 2)] * N = 1000 + [1000 / 50] * 200 = 5000 I/Os
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
-
+    First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
+    Order is scanned once, each Customer group is scanned once per matching Order tuple.
+    So we get the final cost: 10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?
+    
 ** 4. What is the cost of joining Order and Customer using a hash join?
 
 ** 5. If un clustered B+−tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
