@@ -85,19 +85,20 @@ EXERCISE 6
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
    First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
    Order is scanned once, each Customer group is scanned once per matching Order tuple.
-# FIXME: this is wrong
-   So we get the final cost: $10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?$
-   $O(M \log M) + O(N \log N) + M + N = 2 * 2 * 1000 + 2 * 2 * 200 + 1000 + 200 = 6000$
+   So we get the final cost: $M * logM + N * logN + M + N = 1000 * log1000 + 200 * log200 + 1200$ I/0s
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
-   We first partition both relations, which means we read and write both relations, so we have cost of 2*(10000 + 2000) I/0s. Then we scan matching partitions, read both relations, so we have cost of  10000 + 2000 I/Os. In total, we have cost 36000 I/Os.
+   We first partition both relations, which means we read and write both relations, so we have cost of 2 * (M + N) = 2 * 1200 I/0s. Then we scan matching partitions, read both relations, so we have cost of  1000 + 200 I/Os. In total, we have cost 3600 I/Os.
 
 ** 5. If unclustered B+tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
    A B+tree for Order would have height $h = \log_2 10000 \approx 13$.
 # Don't know how to compute how many values I should match.
-
-** 6. Reconsider the question above when the B+tree index is clustered.
-   If the B+tree index is clustered we only have the cost of scanning the height of the tree.
+   For index nested loop join:
+   Since it is unclustered B^{+}−tree, for each Order tuple, cost of probing Customer index is 3, and Cost of then finding S tuples is upto 1 I/O per matching S tuple. The cost is M + ( (M*pR) * cost of index and data access ) = 1000 + 10000 * (3 + 1) = 41000 I/Os
+   For a block nested loop join, we need 2 * 2 * M + 2 * 2 * N + M + N = 4000 + 800 + 1200 = 6000 I/0s
+# I am not sure whether we should compare them like this. Isn't it too obvious? I also don't understand and not sure about the 2*2 in block nested loop join
+** 6. Reconsider the question above when the B^{+}−tree index is clustered.
+   If the B^{+}-tree index is clustered we only have the cost of scanning the height of the tree.
 # not really sure here either
 
    
