@@ -8,15 +8,15 @@ EXERCISE 6
 ** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases? Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
    
    In general equality selection must be done scanning the whole data and checking over the key we need to compare.
-   Using indexes or (un)clustered B^{+}-Trees can reduce the number of I/O operations.
-   Here we have 20 records for B^{+}-tree and 10 records for each page, this means that we can't store the whole B-tree in one page, but they can span over more pages.
+   Using indexes or (un)clustered B+-trees can reduce the number of I/O operations.
+   Here we have 20 records for B+-tree and 10 records for each page, this means that we can't store the whole B-tree in one page, but they can span over more pages.
    The number of matching records should not influence the number of I/O operations needed.
 
    When relations are not clustered it takes $T(R)$ I/Os instead of $B(R)$ I/Os to read all the tuples in R.
 
 *** (a) with a clustered b-tree of height 3 (matching records are located in one page)
-    This is the best scenario, a clustered B^{+}-Tree records all the data in a sorted order on disk.
-    I/O $cost = h + 1 = 4$, we only need to go through the tree in vertical and the read the data page.
+    This is the best scenario, a clustered B+Tree records all the data in a sorted order on disk.
+    I/O $cost = h + 1 = 4$, we only need traverse the tree from root to leaf and then read the data page.
 
 *** (b) without any index, nor is the file sorted on the attribute occurring in selection
     This is the worst possible case, we need to scan over all the records and check the equality of the attribute.
@@ -40,9 +40,10 @@ EXERCISE 6
     - remove unnecessary attributes
     - delete all the possible duplicates that we generated
     If we use a sorting-based algorithm then all the duplicates can only be adjacent, and it becomes very easy to detect and delete them.
-    The complexity is then $O(M \log{M})$, where for M we denote the number of pages.
+    The complexity is then $O(N \log{N})$, where for N we denote the number of pages.
     
 *** (b) If the records are distributed uniformly, what is the complexity for hash-based projection?
+# FIXME: this one can be written better
     For hash-based projection the best-case is $O(N)$.
     To be more precise we have to compose the cost of partitioning and comparing, so we get
     $partCost + inBucketCompCost = (N + N) + N = 3N$
@@ -51,8 +52,8 @@ EXERCISE 6
 *** (c) Why is sorting-based projection the standard solution in practice (or why is it superior to hash-based projection)?
     In general a sorting-based projection is used because:
     - sorting is a basic routine in database implementations and the code is fairly optimized
-    - hashing can even fail if the bucket is too large
-    - hashing is less general than sorting and its performances are too dependent on the data distribution
+    - hashing can fail if the bucket is too large
+    - hashing-based projection can become very slow if the data are not distributed uniformly
 
 * 2. Join
   Consider $Order \Join_{Order.cid=Customer.id} Customer$.
@@ -63,12 +64,17 @@ EXERCISE 6
   - each Customer tuple matches 5 tuples in Order
   - it takes 3 I/O operations to access a leaf of $B^{+}- tree$ for Order, 2 I/Os for Customer.
 
+  Formalizing the following data are given:
+  - M = 1000 (number of pages in /Order/)
+  - N = 200 (number of pages in /Customer/)
+  - Po = 10 (number of tuples/page in /Order/)
+  - Pc = 10 (number of tuples/page in /Customer/)
+  - B = 52 (number of buffer pages)
+
 ** 1. What is the cost of joining Order and Customer using a page-oriented simple nested loops join?
    The Order relation is the outer relation, while the customer relation is inner. 
-   The page number of outer relation is $M = 10000 / 10 = 1000$
-   the page number of inner relation is $N = 2000 / 10 = 200$
    Since in this case the join is page-oriented, the cost is:
-   $M + M * N = 1000 + 1000 * 200 \approx on 2 * (10^5)$ I/Os
+   $M + (Po * M * N) = 1000 + (10 * 1000 * 200) \approx on 2 * (10^6)$ I/Os
     
 ** 2. What is the cost of joining Order and Customer using a block nested loops join?
    Having 
@@ -79,17 +85,19 @@ EXERCISE 6
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
    First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
    Order is scanned once, each Customer group is scanned once per matching Order tuple.
+# FIXME: this is wrong
    So we get the final cost: $10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?$
+   $O(M \log M) + O(N \log N) + M + N = 2 * 2 * 1000 + 2 * 2 * 200 + 1000 + 200 = 6000$
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
    We first partition both relations, which means we read and write both relations, so we have cost of 2*(10000 + 2000) I/0s. Then we scan matching partitions, read both relations, so we have cost of  10000 + 2000 I/Os. In total, we have cost 36000 I/Os.
 
-** 5. If unclustered B^{+}−tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
-   A B^{+}-tree for Order would have height $h = \log_2 10000 \approx 13$.
+** 5. If unclustered B+tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
+   A B+tree for Order would have height $h = \log_2 10000 \approx 13$.
 # Don't know how to compute how many values I should match.
 
-** 6. Reconsider the question above when the B^{+}−tree index is clustered.
-   If the B^{+}-tree index is clustered we only have the cost of scanning the height of the tree.
+** 6. Reconsider the question above when the B+tree index is clustered.
+   If the B+tree index is clustered we only have the cost of scanning the height of the tree.
 # not really sure here either
 
    
