@@ -63,13 +63,14 @@ EXERCISE 6
    $M + M * N = 1000 + 1000 * 200 = 2 * (10^5)$ I/Os
     
 ** 2. What is the cost of joining Order and Customer using a block nested loops join?
-    One buffer page is for scanning inner Customer, so we use (52-2) buffer pages for holding the blocks of outer  Order. 
-    The cost is:
-    M + [M / (B - 2)] * N = 1000 + [1000 / 50] * 200 = 5000 I/Os
+   One buffer page is for scanning inner Customer, so we use (52-2) buffer pages for holding the blocks of outer  Order. 
+   The cost is:
+   $M + [M / (B - 2)] * N = 1000 + [1000 / 50] * 200 = 5000$ I/Os
+
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
-    First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
-    Order is scanned once, each Customer group is scanned once per matching Order tuple.
-    So we get the final cost: 10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?
+   First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
+   Order is scanned once, each Customer group is scanned once per matching Order tuple.
+   So we get the final cost: $10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?$
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
 
