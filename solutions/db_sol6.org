@@ -39,12 +39,16 @@ EXERCISE 6
     The complexity is then $O(M \log{M})$, where for M we denote the number of pages.
     
 *** (b) If the records are distributed uniformly, what is the complexity for hash-based projection?
-    Uniformity is a good thing for hashing, it allows to define less "indexes".
+    For hash-based projection the best-case is $O(N)$.
+    To be more precise we have to compose the cost of partitioning and comparing, so we get
+    $partCost + inBucketCompCost = (N + N) + N = 3N$
+    To have good performances with hash-based projections the buckets must fit in memory.
 
 *** (c) Why is sorting-based projection the standard solution in practice (or why is it superior to hash-based projection)?
-    External sorting is quite efficient and we can also modify it to have an even more efficient projection.
-    In general the cost is $O(M \log{M})$
-    /hash-based/ projections introduce more complexity and don't give any.
+    In general a sorting-based projection is used because:
+    - sorting is a basic routine in database implementations and the code is fairly optimized
+    - hashing can even fail if the bucket is too large
+    - hashing is less general than sorting and its performances are too dependent on the data distribution
 
 * 2. Join
   Consider $Order \Join_{Order.cid=Customer.id} Customer$.
