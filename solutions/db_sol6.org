@@ -72,7 +72,7 @@ EXERCISE 6
     So we get the final cost: 10000 * log10000 + 2000 * log2000 + 10000 + 2000 = ?
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
-
+    We first partition both relations, which means we read and write both relations, so we have cost of 2*(10000 + 2000) I/0s. Then we scan matching partitions, read both relations, so we have cost of  10000 + 2000 I/Os. In total, we have cost 36000 I/Os.
 ** 5. If un clustered B+−tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
 
 ** 6. Reconsider the question above when the B+ − tree index is clustered.
