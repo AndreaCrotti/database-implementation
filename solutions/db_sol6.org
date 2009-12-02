@@ -7,7 +7,7 @@ EXERCISE 6
 * 1. Selection and projection
 ** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases? Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
    
-   In general equality selection must be done scanning the the whole data and checking over the key we need to compare.
+   In general equality selection must be done scanning the whole data and checking over the key we need to compare.
    Using indexes or (un)clustered B+Trees can reduce the number of I/O operations.
    Here we have 20 records for B-tree and 10 records for each page, this means that we can't store the whole B-tree in one page, but they can span over more pages.
    The number of matching records should not influence the number of I/O operations needed.
@@ -15,19 +15,23 @@ EXERCISE 6
    When relations are not clustered it takes $T(R)$ I/Os instead of $B(R)$ I/Os to read all the tuples in R.
 
 *** (a) with a clustered b-tree of height 3 (matching records are located in one page)
-    This is the best possible scenario, a clustered B^{+}-Tree records all the data in a sorted order on disk.
-    
+    This is the best scenario, a clustered B^{+}-Tree records all the data in a sorted order on disk.
+    I/O $cost = h + 1 = 4$, we only need to go through the tree in vertical and the read the data page.
 
 *** (b) without any index, nor is the file sorted on the attribute occurring in selection
     This is the worst possible case, we need to scan over all the records and check the equality of the attribute.
-    So the number of I/Os needed is just the total number of records, $1000 * 10 = 10000
+    So the number of I/Os needed is the total number of pages of the relation.
+    I/O $cost = 1000$
 
 *** (c) with an unclustered b-tree index of height 3, and there are 10 matching records
-    Looking up the index is much cheaper than scanning the whole set of records.
-    Here we can use the index on that attribute and then fetch the corresponding page.
+    We scan through the tree and in plus we must read the pages which this time are not contiguous as before.
+    So we get
+    I/O $cost = h + k = 13$
 
 *** (d) with an unclustered b-tree of height 3 and one tenth of the records match the selection
-    
+    Same as before, having more records matching the selection makes the unclustered b-tree much less convenient.
+    I/O $cost = h + #tuples/10 = 3 + 1000 = 10003$
+    If the matching rate is higher than it's even faster to do a total lookup on the pages.
     
 ** 2. We assume the relation is of N pages.
 
@@ -78,8 +82,9 @@ EXERCISE 6
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
     We first partition both relations, which means we read and write both relations, so we have cost of 2*(10000 + 2000) I/0s. Then we scan matching partitions, read both relations, so we have cost of  10000 + 2000 I/Os. In total, we have cost 36000 I/Os.
+
 ** 5. If un clustered B+−tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
 
 ** 6. Reconsider the question above when the B+ − tree index is clustered.
-
-
+   
+   
