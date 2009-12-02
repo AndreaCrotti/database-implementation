@@ -113,5 +113,8 @@ EXERCISE 6
    
    If the B^{+}-tree index is clustered we only have the cost of scanning the height of the tree.
 # not really sure here either
+   The cost of finding S tuples depends on clustering.
+   Clustered index: 1 I/O , unclustered: upto1 I/O per matching S tuple
+# so? I don't know...
 
    
