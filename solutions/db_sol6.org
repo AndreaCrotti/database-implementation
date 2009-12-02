@@ -70,6 +70,7 @@ EXERCISE 6
   - Po = 10 (number of tuples/page in /Order/)
   - Pc = 10 (number of tuples/page in /Customer/)
   - B = 52 (number of buffer pages)
+  - Ord_for_Cust = 5 (tuples of Order matching any Customer)
 
 ** 1. What is the cost of joining Order and Customer using a page-oriented simple nested loops join?
    The Order relation is the outer relation, while the customer relation is inner. 
@@ -83,12 +84,17 @@ EXERCISE 6
    $M + \lceil M / (B - 2)\rceil * N = 1000 + \lceil 1000 / 50 \rceil * 200 = 5000$ I/Os
 
 ** 3. What is the cost of joining Order and Customer using a sort-merge join?
-   First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
-   Order is scanned once, each Customer group is scanned once per matching Order tuple.
-   So we get the final cost: $M * logM + N * logN + M + N = 1000 * log1000 + 200 * log200 + 1200$ I/0s
+# First we need to sort the two relations. So we get cost: 10000 * log10000 + 2000 * log2000
+# Order is scanned once, each Customer group is scanned once per matching Order tuple.
+# So we get the final cost: $M * logM + N * logN + M + N = 1000 * log1000 + 200 * log200 + 1200$ I/0s
+   Sorting must be done in two phases:
+   $O(M \log M) + O(N \log N) + M + N =  2*2*1000 + 2*2*200 + 1000 + 200 = 6000$ I/0s
     
 ** 4. What is the cost of joining Order and Customer using a hash join?
-   We first partition both relations, which means we read and write both relations, so we have cost of 2 * (M + N) = 2 * 1200 I/0s. Then we scan matching partitions, read both relations, so we have cost of  1000 + 200 I/Os. In total, we have cost 3600 I/Os.
+   We first partition both relations, which means we read and write both relations, so we have cost of 2 * (M + N) = 2 * 1200 I/0s.
+   Then we scan matching partitions, read both relations, so we have cost of 1000 + 200 I/Os.
+   So:
+   $Tot = Cost(Partitioning) + Cost(Matching) = 2400 + 1200 = 3600$ I/Os
 
 ** 5. If unclustered B+tree index existed on Order.cid or Customer.id,would either provide a cheaper alternative (index nexted loop join) for performing the join than a block nested loop join?
    A B+tree for Order would have height $h = \log_2 10000 \approx 13$.
@@ -96,8 +102,15 @@ EXERCISE 6
    For index nested loop join:
    Since it is unclustered B^{+}−tree, for each Order tuple, cost of probing Customer index is 3, and Cost of then finding S tuples is upto 1 I/O per matching S tuple. The cost is M + ( (M*pR) * cost of index and data access ) = 1000 + 10000 * (3 + 1) = 41000 I/Os
    For a block nested loop join, we need 2 * 2 * M + 2 * 2 * N + M + N = 4000 + 800 + 1200 = 6000 I/0s
+
+   We can use the index on the join column of one relation and make it the inner loop (that's where you lose more time).
+   So we get:
+   $Cost = M + (M * Po * Ord_for_Cust) = 1000 + (1000 * 10 * 5) = 51000$
+   In this case we don't get any advantage using a B+tree.
+
 # I am not sure whether we should compare them like this. Isn't it too obvious? I also don't understand and not sure about the 2*2 in block nested loop join
-** 6. Reconsider the question above when the B^{+}−tree index is clustered.
+** 6. Reconsider the question above when the B+−tree index is clustered.
+   
    If the B^{+}-tree index is clustered we only have the cost of scanning the height of the tree.
 # not really sure here either
 
