@@ -1,0 +1,21 @@
+EXERCISE 7
+#+SETUPFILE: options.org
+
+* TODO 
+  DEADLINE: <2009-12-09 Mer>
+
+* Exercise 7.1
+
+* Exercise 7.2
+
+** 1.
+
+** 2.
+
+*** (a)
+
+*** (b)
+
+*** (c)
+
+*** (d)
