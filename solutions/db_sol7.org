@@ -5,6 +5,20 @@ EXERCISE 7
   DEADLINE: <2009-12-09 Mer>
 
 * Exercise 7.1
+  Given two relations R(x, y) and S(y, z) and the following data:
+  - T(R) = 1000
+  - T(S) = 600
+  - V(R, Y) = 150
+  - V(S, Y) = 40
+  - min(R.y) = min(S.y) = 0 and max(R.y) = max(S.y) = 200
+  Where V(R, A) is the number of distinct numbers of attribute A in relation R
+  
+** 1. If we assume uniform distribution, what is the selectivity of each of the expressions?
+   
+
+** 2. If the database holds a histogram of the relations as follows, what are the selectivities?
+
+** 3. What are the error rates of the first estimation against the second?
 
 * Exercise 7.2
 
