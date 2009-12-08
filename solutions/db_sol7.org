@@ -18,17 +18,31 @@ EXERCISE 7
   + R \Join S
   
 ** 1. If we assume uniform distribution, what is the selectivity of each of the expressions?
-# I don't really understood what is this thing but it's at page 124
    - \sigma_{y=2}(R):
      F = 1/ICARD(colindex)
-# Do we have an index or not?
+     so $F = 1/150$
    - \sigma_{y<3}(R)
-     F = 1/3
+     $F(\sigma_{y < 3}(R)) = F(NOT(\sigma_{y >= 3})(R)) = F(NOT(\sigma_{y > 3 or y == 3})(R)) =$
+     $1 - ((3 / 200) + (1 / 150)) - (3 / 200)*(1/150) = (29347 / 30000)$
+     This number is very close to 1, and in fact this selection is removing only a small part of the data.
+   - R \Join S
+     $F(R \Join S) = 1 / max(V(R, y), V(S, y)) = 1 / 150$
      
 
 ** 2. If the database holds a histogram of the relations as follows, what are the selectivities?
+   - \sigma_{y=2}(R):
+     Simply the number of tuples where y=2 divided by the total number of tuples.
+     $F(\sigma_{y=2}(R)) = 100 / 1000 = 1/10$
+   - \sigma_{y<3}(R)
+     Counting the tuples where y < 3, so:
+     $F(\sigma_{y<3}(R)) = (300 + 120 + 100) / 1000 = 520 / 1000 \approx 1/2$
+   - $R \Join S$
+     In this case we can only have 10 tuples in our output at maximum.
+     Given that in the interval 161-200 we have 600 values and given that in each bucket the distribution is uniform, we can be sure that all those 10 values of y in R will match a value of y in S.
+     $F(R \Join S) = 10 / V(R, y) * V(S, y) = 10 / (40 * 150) = 1/600$
 
 ** 3. What are the error rates of the first estimation against the second?
+   
 
 * Exercise 7.2
   Consider the query $\pi_{A,B,C,D}(R \Join_{A=C} S)$
