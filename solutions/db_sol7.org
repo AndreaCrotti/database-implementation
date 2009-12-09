@@ -1,5 +1,6 @@
 EXERCISE 7
 #+SETUPFILE: options.org
+#+OPTIONS: \n:t
 
 * TODO 
   DEADLINE: <2009-12-09 Mer>
@@ -18,31 +19,34 @@ EXERCISE 7
   + R \Join S
   
 ** 1. If we assume uniform distribution, what is the selectivity of each of the expressions?
-   - \sigma_{y=2}(R):
-     F = 1/ICARD(colindex)
-     so $F = 1/150$
-   - \sigma_{y<3}(R)
-     $F(\sigma_{y < 3}(R)) = F(NOT(\sigma_{y >= 3})(R)) = F(NOT(\sigma_{y > 3 or y == 3})(R)) =$
+   - \sigma_{y=2}(R): 
+     Assuming uniform distribution we can think that one element every 150 has value 2.
+     $F = 1/150$
+# FIXME: check if this is correct
+   - \sigma_{y<3}(R): 
+     $F(\sigma_{y < 3}(R)) = F(NOT(\sigma_{y >= 3})(R)) = F(NOT(\sigma_{y > 3} \vee \sigma_{y = 3})(R)) =$
      $1 - ((3 / 200) + (1 / 150)) - (3 / 200)*(1/150) = (29347 / 30000)$
-     This number is very close to 1, and in fact this selection is removing only a small part of the data.
+     This number is very close to 1, and in fact this selection is "removing" only a small percentage of the data.
    - R \Join S
+     We take the worst case, when the values of y in R are all different from the values of Y in S, so: 
      $F(R \Join S) = 1 / max(V(R, y), V(S, y)) = 1 / 150$
      
-
 ** 2. If the database holds a histogram of the relations as follows, what are the selectivities?
-   - \sigma_{y=2}(R):
+   - \sigma_{y=2}(R): 
      Simply the number of tuples where y=2 divided by the total number of tuples.
      $F(\sigma_{y=2}(R)) = 100 / 1000 = 1/10$
-   - \sigma_{y<3}(R)
+   - \sigma_{y<3}(R): 
      Counting the tuples where y < 3, so:
      $F(\sigma_{y<3}(R)) = (300 + 120 + 100) / 1000 = 520 / 1000 \approx 1/2$
-   - $R \Join S$
+# FIXME: check if this is correct
+   - $R \Join S$: 
      In this case we can only have 10 tuples in our output at maximum.
      Given that in the interval 161-200 we have 600 values and given that in each bucket the distribution is uniform, we can be sure that all those 10 values of y in R will match a value of y in S.
      $F(R \Join S) = 10 / V(R, y) * V(S, y) = 10 / (40 * 150) = 1/600$
 
 ** 3. What are the error rates of the first estimation against the second?
-   
+   From those data we can also get the size of $C + D$.
+   $A + B + C + D = 450 - (A + B) = 250 bytes$
 
 * Exercise 7.2
   Consider the query $\pi_{A,B,C,D}(R \Join_{A=C} S)$
@@ -56,13 +60,64 @@ EXERCISE 7
   - combined size of A,B,C,D is 450 bytes
 
 ** 1. Cost of writing out the final result
+   Given those data we can compute also how many tuples per relation we have.
+   We need to use integer division, it's not of course possible to store a fraction of a tuple in one page.
+   $T(R) = (1024 / 300) * 10 \approx 30$
+   $T(S) = (1024 / 500) * 100 \approx 200$
+   During the join operation every tuple of S corresponds to a tuple of R, so we wet
+   $T(R \Join_{A=C} S) = 30$
+   After the projection we know that the resulting tuple containing the fields "A, B, C, D" has a size of 450 bytes.
+   That means that in total to write out the final result we need
+   $30 / (1000 / 450) \approx 15$ pages.
 
 ** 2. Suppose that three buffer pages are available, the only join method that is implemented is page-oriented nested loops, and 1/10 of the tuples are removed as duplicates after projection.
 
 *** (a) Compute the cost of doing the projection followed by the join.
+**** Join
+    We choose R as the outer loops given that R has less tuples.
+    Using the formula for page-oriented nested loops we get that the cost of the join is
+    $C(j) = 10 + 10*100 = 1010$ pages.
+# FIXME: does it make any sense? Not using the informations about discarded data
+    So we have used 30 pages for the result as given before.
+
+**** Sort
+    After joining R & S, we have 30 pages result as computed above.
+    In the first pass of modified external merge sort algorithm, 30 pages is read in and sorted.
+    During sort, projection is also done. As a result, 15 pages were written out as computed in first question.
+
+**** Merge
+     Due to the projection, there are only 15 pages left as a result, computed before. Supposing simple two-way merge is used here, we need log2(15) = 4 passes to merge the result. As best, 1/10 of tuples are removed after the first pass of merge, then the cost of first merge would be: 15 + 15*(1-1/10) = 15 + 14 = 29. And the cost of rest 3 passes of merge would be:
+15 * (1-1/10) * 3 * 2 = 84 page IOs.	The cost of merge in total is 84 + 29 = 113. As worst, 1/10 of tuples are removed after the last pass of merge, then the cost of merge would be 15 * 3 * 2 + 15 + 15*(1-1/10) = 119 page IOs
 
 *** (b) Compute the cost of doing the join followed by the projection.
+**** Projection
+     From 10 pages of 30 original tuples to 6 pages of 30 (A, B)tuples, as 1/10 tuples would be removed at last, we need 30*(1-1/10)/5 = round(5.4) = 6 pages as result.
+     Need log2(6) = 3 passes for merge.
+     So the total cost of projection R(A,B) is 10 + 6 + 6*3*2 = 52 Page IOs.
+     Projection of S(C,D) from 100 pages of 200 original tuples to 50 pages of 200 (C, D)tuples.
+     Similar with above, finally we need 200*(1-1/10)/4 = 45 pages as result. Need log2(50) = 6 passes for merge.
+     So the total cost of projection S(C,D) is: At best,	(100 + 50) + (50 + 45) + 45*5*2 = 695 Page IOs.
+     At worst, (100 + 50) + 50*5*2 + (50 + 45) = 745 Page IOs.
+
+**** Join
+     As page-oriented nested loop algorithm is implemented for join, so take the smaller relation R(A, B) as outer loop comparing to S(C, D), we have cost of 6 + 6 * 45 = 276 Page IOs.
+     In total, the cost as follows:
+     At best,	52 + 695 + 276 = 1023
+     At worst, 52 + 745 + 276 = 1073
 
 *** (c) Compute the cost of doing the join first and then the projection on-the-fly.
+**** Join and Projection on the fly
+     As page-oriented nested loops algorithm is used for join of relations R, S and R has less pages, so take R as the outer loop, the join cost is 10 + 10 * 100 = 1010 page IOs.
+
+**** Eliminating duplicates
+     During the first step, a hash function could be used to filter out the duplicates which should take (A,B,C,D) as a hash key.
+     Suppose there is enough buffer to host the all of join result, because we try to do the projection on-the-fly not afterwards.
+     So that there would be only 15 more Page IOs needed to write out the result.
+     Otherwise, we might need to write out all of rough join result pages first, and then eliminate the duplicates later, which would cost more than 15 page IOs.
+     So in total, the minimal cost would be 1010+15 = 1025 page IOs.
 
 *** (d) Would your answers change if 11 buffer pages were available?
+    With 11 buffer pages we could have improved dramatically the performance of the sort-merge algorithm.
+    Instead of a 2-way buffer as used here we could have used a 9-way buffer, thus needing less passes.
+    Changing to 11 buffer then would have given a great benefit to projection (modified external merge sort was used for it).
+    But in this case *nothing* would have changed for the join operation, given that it was implemented using page-oriented nested loop algorithm.
