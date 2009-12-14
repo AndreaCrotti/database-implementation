@@ -1,0 +1,30 @@
+EXERCISE 8
+#+SETUPFILE: options.org
+#+OPTIONS: \n:t
+
+* 1. Query Languages	(5 pt.)
+** 1. Assume that no two columns of relations have the same name.
+   Show that a query in the normal form ╥c(σF (R1 x R2 x ... x Rn)) can be expressed in Domain Relational Calculus (DRC), where c is a vector of columns, F is a boolean formula built from conjunctions of atoms in the form ci = cj or ci = constant (ci and ci are columns).
+
+** 2. What does “relational completeness” mean? Show that SQL is relational complete by enu- merating SQL constructs corresponding to selection, projection, cartesian product, union, and difference. Give two examples of SQL constructs/semantics not expressible in relational algebra (RA).
+
+** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
+select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
+
+** 4. For the following database (VIP is empty), what is the result of the query above? What is the result of \pi_{\phi}(Employee) (Employee)?
+
+** 5. Figure 1 shows the flow of a query through a DBMS, in which different forms are used to represent a query at different stages. Fill in the three blanks with the corresponding query languages (i.e., SQL, RC, RA).
+
+* 2.	Query Formulation	(15 pt.)
+Formulate the following queries as expressions in relational algebra, tuple relational calculus, domain relational calculus and SQL:
+** a) Find name and city of all persons who work for the company 'MyComp' and earn less than 10000.
+
+
+** b) Find the names of all persons, who don't work for 'MyComp' (or do not work at all).
+
+
+** c) Findthenamesofallpersons,wholiveinacitythatthecompanytheyareworkingforis not located in. 
+
+
+** d) Find the names of all managers, whose company is not placed in Munich or Hamburg. e) Find the names of all companies that are located in exactly the same cities as 'MyComp', assuming each company is located in some city.
+
