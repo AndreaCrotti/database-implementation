@@ -24,6 +24,12 @@ EXERCISE 8
 ** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
    select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
 
+*** Relational calculus   
+    
+
+*** Relational algebra
+    \pi_{Male.id}(\sigma_{Vip.id=Male.id \vee Employee.id=Mal.id}(VIP \times Employee \times Male)
+
 ** 4. For the following database (VIP is empty), what is the result of the query above? What is the result of \pi_{\phi}(Employee) (Employee)?
 
 ** 5. Figure 1 shows the flow of a query through a DBMS, in which different forms are used to represent a query at different stages. Fill in the three blanks with the corresponding query languages (i.e., SQL, RC, RA).
@@ -31,13 +37,33 @@ EXERCISE 8
 * 2.	Query Formulation	(15 pt.)
 Formulate the following queries as expressions in relational algebra, tuple relational calculus, domain relational calculus and SQL:
 ** a) Find name and city of all persons who work for the company 'MyComp' and earn less than 10000.
+*** Relational Algebra:
+    \pi_{person_name, city} (\sigma_{cpmany_name='MyComp'\wedge salary <10000} ( lives \join works)
+#this is wrong way to write it, but the content should be correct: Tupel Calculus: {n.person_name,n.city | n \in  lives \wedge \existsy \in works (n.person_name = y.person_name \wedge y.salary < 10000 \wedge y.company_name='MyComp') }
+*** Domain Calculuis:
+    {[p,c] | \exists st([p,c,st] \in lives \wedge \exists f,g ([p,f,g] \in works \wedge g < 10000))}
 
 
 ** b) Find the names of all persons, who don't work for 'MyComp' (or do not work at all).
+*** Relational Algebra:
+    \pi_{person_name}(lives) - \pi_{person_name}(\sigma_{company_name='MyComp'(works))
+
+*** Tuple Calculus:
+    \{ p.per_name | p \in lives \wedge \exists y \in works (p.person_anem = y.person_name \wedge y.company_name != 'MyComp')\}
+
+*** Domain Calculus:
+    \{name | lives(name, _ , _) \wedge works(name, comp, _) \wedge comp != 'MyComp'\}
 
 
 ** c) Findthenamesofallpersons,wholiveinacitythatthecompanytheyareworkingforis not located in. 
+*** Relational Algebra:
+    \pi_{person_name} ( lives \join works \join (\pi_city (lives) X \pi_{company_name}(works) - located))
+
+*** Tuple Calculus:
+    \{ p.peron_name | p \in lives \wedge \exists x \in works \wedge \exists y \in located ( p.person_name = x.person_name \wedge x.company_name = y.company_name \wedge y.city != p.city) \}
+
+*** Domain Calculus:
+    \{ p | lives (p,c,st) \wedge \exists works (p,f,g) \wedge \exists located(f,c_1) \wedge c != c_1
 
 
 ** d) Find the names of all managers, whose company is not placed in Munich or Hamburg. e) Find the names of all companies that are located in exactly the same cities as 'MyComp', assuming each company is located in some city.
-
