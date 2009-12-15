@@ -8,12 +8,21 @@ EXERCISE 8
 # Here on what field are we doing the join with on all the relations
 
 ** 2. What does “relational completeness” mean?
-   Show that SQL is relational complete by enu- merating SQL constructs corresponding to selection, projection, cartesian product, union, and difference.
+   Show that SQL is relational complete by enumerating SQL constructs corresponding to selection, projection, cartesian product, union, and difference.
    Give two examples of SQL constructs/semantics not expressible in relational algebra (RA).
    
+   A language is /relational complete/ if it can express all possible queries expressible by RA.
+   If we can map the RA operations to SQL constructs than we have shown that SQL is in fact relational complete.
+   
+# Why should be -> from??
+   | selection  | where  |
+   | projection | select |
+   | Join       | from   |
+   | union      | union  |
+   | difference | except |
 
 ** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
-select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
+   select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
 
 ** 4. For the following database (VIP is empty), what is the result of the query above? What is the result of \pi_{\phi}(Employee) (Employee)?
 
