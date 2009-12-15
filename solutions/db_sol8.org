@@ -54,7 +54,7 @@ EXERCISE 8
 #+end_src
 
 *** \pi_{\phi}(Employee) (Employee)
-    
+# This means projection over the empty set
 
 
 ** 5. Figure 1 shows the flow of a query through a DBMS, in which different forms are used to represent a query at different stages. Fill in the three blanks with the corresponding query languages (i.e., SQL, RC, RA).
