@@ -1,0 +1,30 @@
+#+OPTIONS: toc:nil
+Latex for org-(ab)users
+[[http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf][list of all latex symbols]]
+
+* Some symbols
+| \sigma | =\sigma= |
+| \pi    | =\pi=    |
+| \Join  | =\Join=  |
+| \in    | =\in=    |
+
+* Arguments
+  Sometimes you need to give arguments to functions.
+  In general we use =_= for lower indexes, =^= for exponents and () for arguments.
+  When you have multiple arguments in the index or the exponent put them together with {}.
+  
+  For example:
+
+| \log_x^2              | =\log_x^2=              |
+| \sigma_{A,B}(\pi_C R) | =\sigma_{A,B}(\pi_C R)= |
+
+
+# * Formulas
+#   When you're writing formulas you should use the $$ as in latex.
+  
+#   See for example the difference between
+  
+#   \sin(x) * 2 : =\sin(x) * 2=
+  
+#   and 
+#   $\sin(x) * 2$ : =$\sin(x) * 2$=
