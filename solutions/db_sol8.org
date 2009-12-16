@@ -4,7 +4,7 @@ EXERCISE 8
 
 * 1. Query Languages	(5 pt.)
 ** 1. Assume that no two columns of relations have the same name.
-   Show that a query in the normal form ╥c(σF (R1 x R2 x ... x Rn)) can be expressed in Domain Relational Calculus (DRC), where c is a vector of columns, F is a boolean formula built from conjunctions of atoms in the form ci = cj or ci = constant (ci and ci are columns).
+   Show that a query in the normal form \pi_c(\sigma_F (R1 x R2 x ... x Rn)) can be expressed in Domain Relational Calculus (DRC), where c is a vector of columns, F is a boolean formula built from conjunctions of atoms in the form ci = cj or ci = constant (ci and ci are columns).
 # Here on what field are we doing the join with on all the relations
 
 ** 2. What does “relational completeness” mean?
@@ -14,12 +14,14 @@ EXERCISE 8
    A language is /relational complete/ if it can express all possible queries expressible by RA.
    If we can map the RA operations to SQL constructs than we have shown that SQL is in fact relational complete.
    
-# Why should be -> from??
+# Why should be Join -> from??
    | selection  | where  |
    | projection | select |
    | Join       | from   |
    | union      | union  |
    | difference | except |
+   
+   SQL 
 
 ** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
    select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
