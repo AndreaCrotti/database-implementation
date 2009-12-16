@@ -92,7 +92,7 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 
 # the join is done in the from (can be explicited also
 #+begin_src sql
-    select person_name, city from (lives, works)
+    select distinct person_name, city from (lives, works)
     where (works.salary < 10000 and works.company_name='MyComp')
 #+end_src
     
@@ -106,10 +106,16 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 *** Domain Calculus:
     \{name | lives(name, _ , _) \wedge works(name, comp, _) \wedge comp != 'MyComp'\}
 
-*** 
+*** SQL
+
+# FIXME: Also consider case where they don't work at all
+#+begin_src sql
+    select lives.person_name from (lives, works)
+    where (works.person_name != 'MyComp'
+#+end_src
+
  
- 
-** c) Findthenamesofallpersons,wholiveinacitythatthecompanytheyareworkingforis not located in.
+** c) Find the names of all persons, who live in a city that the company they are working for is not located in.
 *** Relational Algebra:
     \pi_{person\_name} ( lives \Join works \Join (\pi_city (lives) X \pi_{company\_name}(works) - located))
  
@@ -118,7 +124,13 @@ Formulate the following queries as expressions in relational algebra, tuple rela
  
 *** Domain Calculus:
     \{ p | lives (p,c,st) \wedge \exists works (p,f,g) \wedge \exists located(f,c_1) \wedge c != c_1
- 
+
+*** SQL
+
+#+begin_src sql
+    select lives.person_name from (lives, works)
+    where lives.city <> works.city
+#+end_src
  
 ** d) Find the names of all managers, whose company is not placed in Munich or Hamburg.
 *** Relational Algebra:
@@ -130,7 +142,12 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 *** Domain Calculus:
     \{ m | \exists p (boss (p,m) \ exists f,s located(f,s) \exists g (works (m,f,g) \wedge s != 'Munich' \wedge s != 'Hamburg'))\}
 
+*** SQL
 
+#+begin_src sql
+    select m.manager_name from (boss m, lives p, works w)
+    where (w.city <> 'Munich' and w.city <> 'Hamburg')
+#+end_src
 
 ** e) Find the names of all companies that are located in exactly the same cities as 'MyComp', assuming each company is located in some city.
 *** Relational Algebra:
@@ -142,3 +159,8 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 *** Domain Calculus:
     \{ f | \exists s(located(f,s) \wedge located(myCompany, s) \wedge myComapny = 'MyComp')}
  
+*** SQL
+
+#+begin_src sql
+    
+#+end_src
