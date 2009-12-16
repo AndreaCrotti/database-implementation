@@ -34,16 +34,23 @@ Latex for org-(ab)users
   | \pi_{\{A,B\}} | =\pi_{\{A,B\}}= |
   
   Here one { is quoted and will be inserted as it is and the other is used to join the arguments.
-
+  
 * Equations
-  Things are getting more complicated here.
+  Things are getting a bit more complicated here.
+  To get an equation system like this you can just paste the code below wherever in your org-file.\\
 
-# * Formulas
-#   When you're writing formulas you should use the $$ as in latex.
-  
-#   See for example the difference between
-  
-#   \sin(x) * 2 : =\sin(x) * 2=
-  
-#   and 
-#   $\sin(x) * 2$ : =$\sin(x) * 2$=
+  \left \{
+  \begin{array}{ll}
+  \mbox{1 if  x <= 0} \\
+  \bot \mbox{ otherwise}
+  \end{array}
+  \right
+
+#+begin_src latex
+  \left \{
+  \begin{array}{ll}
+  \mbox{1 if  x <= 0} \\
+  \bot \mbox{ otherwise}
+  \end{array}
+  \right
+#+end_src

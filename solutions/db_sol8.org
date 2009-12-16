@@ -6,6 +6,11 @@ EXERCISE 8
 ** 1. Assume that no two columns of relations have the same name.
    Show that a query in the normal form \pi_c(\sigma_F (R1 x R2 x ... x Rn)) can be expressed in Domain Relational Calculus (DRC), where c is a vector of columns, F is a boolean formula built from conjunctions of atoms in the form ci = cj or ci = constant (ci and ci are columns).
 # Here on what field are we doing the join with on all the relations
+   To show that we must simply demonstrate that the operators involved here are also expressible in DRC.
+   So we have that:
+   - Projection is expressible in DRC
+   - Cross is translated to conjunction of all the occurring predicates using all distinct /ci/ variables
+   - Selection is done by merging variables or replacing variables with constants according to the selection predicate.
 
 ** 2. What does “relational completeness” mean?
    Show that SQL is relational complete by enumerating SQL constructs corresponding to selection, projection, cartesian product, union, and difference.
@@ -80,29 +85,29 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 I used this schema to try the queries with sqlite:
 
 #+begin_src sql
-        CREATE TABLE lives(person_name PRIMARY KEY, city, street);
-        CREATE TABLE works(person_name PRIMARY KEY, company_name, salary);
-        CREATE TABLE located(company_name PRIMARY KEY, city);
-        CREATE TABLE boss(person_name PRIMARY KEY, manager_name);
+CREATE TABLE lives(person_name PRIMARY KEY, city, street);
+CREATE TABLE works(person_name PRIMARY KEY, company_name, salary);
+CREATE TABLE located(company_name PRIMARY KEY, city);
+CREATE TABLE boss(person_name PRIMARY KEY, manager_name);
 
-        insert into lives values(1, 'mantova', 'pippo');
-        insert into lives values(2, 'brescia', 'pippo');
-        insert into lives values(3, 'brescia', 'abc');
-        insert into lives values(4, 'Hamburg', 'abc');
-        insert into lives values(5, 'nonwork', 'df');
+insert into lives values(1, 'mantova', 'pippo');
+insert into lives values(2, 'brescia', 'pippo');
+insert into lives values(3, 'brescia', 'abc');
+insert into lives values(4, 'Hamburg', 'abc');
+insert into lives values(5, 'nonwork', 'df');
 
-        insert into works values(1, 'MyComp', 100);
-        insert into works values(2, 'BigComp', 200);
-        insert into works values(3, 'MyComp', 100000);
-        insert into works values(4, 'Ham', 200);
+insert into works values(1, 'MyComp', 100);
+insert into works values(2, 'BigComp', 200);
+insert into works values(3, 'MyComp', 100000);
+insert into works values(4, 'Ham', 200);
 
-        insert into located values('MyComp', 'brescia');
-        insert into located values('BigComp', 'verona');
-        insert into located values('Ham', 'Hamburg');
+insert into located values('MyComp', 'brescia');
+insert into located values('BigComp', 'verona');
+insert into located values('Ham', 'Hamburg');
 
-        insert into boss values(1, 'firstboss');
-        insert into boss values(2, 'secondboss');
-        insert into boss values(4, 'third');
+insert into boss values(1, 'firstboss');
+insert into boss values(2, 'secondboss');
+insert into boss values(4, 'third');
 #+end_src
 
 
@@ -118,9 +123,10 @@ I used this schema to try the queries with sqlite:
     {p, c | \exists st(lives(p,c,st)  \wedge \exists f,g (works(p,f,g) \wedge g < 10000))}
 
 *** SQL
-    Using an explicit join on the person_name attribute
+    Using an explicit join on the person\_name attribute
 #+begin_src sql
-    select p.person_name, city from lives p join works w on p.person_name=w.person_name
+    select p.person_name, city from lives p join works w
+    on p.person_name=w.person_name
     where (w.salary < 10000 and w.company_name='MyComp')
 #+end_src
     
@@ -142,7 +148,8 @@ I used this schema to try the queries with sqlite:
     except
     select person_name from works
     union
-    select lives.person_name from lives join works on lives.person_name=works.person_name
+    select lives.person_name
+    from lives join works on lives.person_name=works.person_name
     where (works.company_name <> 'MyComp')
 #+end_src
 
@@ -159,7 +166,8 @@ I used this schema to try the queries with sqlite:
 *** SQL
     Here we concatenate 2 joins on the person and on the company_name.
 #+begin_src sql
-    select p.person_name,p.city from lives p join works w on p.person_name=w.person_name
+    select p.person_name,p.city
+    from lives p join works w on p.person_name=w.person_name
     join located l on w.company_name=l.company_name
     where l.city <> p.city;
 #+end_src
@@ -179,7 +187,8 @@ I used this schema to try the queries with sqlite:
 
 #+begin_src sql
     select m.manager_name
-    from boss m join works w on m.person_name=w.person_name
+    from boss m join works w
+    on m.person_name=w.person_name
     join located l on l.company_name=w.company_name
     where l.city <> 'Hamburg'
 #+end_src
