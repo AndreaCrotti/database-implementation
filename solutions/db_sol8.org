@@ -1,6 +1,6 @@
 EXERCISE 8
 #+SETUPFILE: options.org
-#+OPTIONS: \n:t
+#+OPTIONS: \n:nil
 
 * 1. Query Languages	(5 pt.)
 ** 1. Assume that no two columns of relations have the same name.
@@ -15,20 +15,28 @@ EXERCISE 8
    If we can map the RA operations to SQL constructs than we have shown that SQL is in fact relational complete.
    
 # Why should be Join -> from??
+   | RA         | SQL    |
+   |------------+--------|
    | selection  | where  |
    | projection | select |
    | Join       | from   |
    | union      | union  |
    | difference | except |
    
-   SQL 
+   SQL is more expressive than relational algebra, for example these SQL operators are not found in relational algebra:
+   - ORDER BY
+   - GROUP BY
+   - UPDATE \\
+     \vdots
 
 ** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
    select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
 
 *** Relational calculus   
 **** Domain
-     {id | \exists id VIP(id) \wedge Employee(id) \wedge Male(id) }
+# check if this is correct     
+     {m.id | Male(m) \wedge ((\exists e Employee(e) \wedge e.id=m.id) \vee (\exists v VIP(v) \wedge v.id=m.id))}
+#     {id | \exists id \mbox{  } VIP(id) \wedge Employee(id) \wedge Male(id) }
 # we don't need other constraints given that the field has always the same name
 
 **** Tuple
@@ -60,26 +68,34 @@ EXERCISE 8
 
 
 ** 5. Figure 1 shows the flow of a query through a DBMS, in which different forms are used to represent a query at different stages. Fill in the three blanks with the corresponding query languages (i.e., SQL, RC, RA).
-
-** 2. What does “relational completeness” mean? Show that SQL is relational complete by enu- merating SQL constructs corresponding to selection, projection, cartesian product, union, and difference. Give two examples of SQL constructs/semantics not expressible in relational algebra (RA).
-
-** 3.  Suppose we have three tables VIP(id), Employee(id), and Male(id). Translate the following SQL query into relational calculus and relational algebra.
-select Male.id from VIP, Employee, Male where VIP.id=Male.id or Employee.id=Male.id
-
-** 4. For the following database (VIP is empty), what is the result of the query above? What is the result of \pi_{\phi}(Employee) (Employee)?
-
-** 5. Figure 1 shows the flow of a query through a DBMS, in which different forms are used to represent a query at different stages. Fill in the three blanks with the corresponding query languages (i.e., SQL, RC, RA).
+   
+   | STEP | LANG |
+   |------+------|
+   |    1 | SQL  |
+   |    2 | RC   |
+   |    3 | RA   |
 
 * 2. Query Formulation (15 pt.)
 Formulate the following queries as expressions in relational algebra, tuple relational calculus, domain relational calculus and SQL:
 ** a) Find name and city of all persons who work for the company 'MyComp' and earn less than 10000.
 *** Relational Algebra:
-    \pi_{person\_name, city} (\sigma_{company\_name='MyComp'\wedge salary <10000} ( lives \join works)
-*** Tuple Calculus: {n.person\_name,n.city | lives(n) \wedge \exists y (\wedge works(y) n.person\_name = y.person\_name \wedge y.salary < 10000 \wedge y.company\_name='MyComp') }
+# FIXME: here we have a city also in works!
+    \pi_{person\_name, city} (\sigma_{company\_name='MyComp'\wedge salary <10000} ( lives \Join works))
+
+*** Tuple Calculus:
+    {n.person\_name,n.city | lives(n) \wedge \exists y (works(y) \wedge n.person\_name = y.person\_name \wedge y.salary < 10000 \wedge y.company\_name='MyComp') }
+
 *** Domain Calculuis:
-    {p,c | \exists st(lives(p,c,st)  \wedge \exists f,g (works(p,f,g) \wedge g < 10000))}
- 
- 
+    {p, c | \exists st(lives(p,c,st)  \wedge \exists f,g (works(p,f,g) \wedge g < 10000))}
+
+*** SQL
+
+# the join is done in the from (can be explicited also
+#+begin_src sql
+    select person_name, city from (lives, works)
+    where (works.salary < 10000 and works.company_name='MyComp')
+#+end_src
+    
 ** b) Find the names of all persons, who don't work for 'MyComp' (or do not work at all).
 *** Relational Algebra:
     \pi_{person\_name}(lives) - \pi_{person\_name}(\sigma_{company\_name='MyComp'(works)})
@@ -89,11 +105,13 @@ Formulate the following queries as expressions in relational algebra, tuple rela
  
 *** Domain Calculus:
     \{name | lives(name, _ , _) \wedge works(name, comp, _) \wedge comp != 'MyComp'\}
+
+*** 
  
  
 ** c) Findthenamesofallpersons,wholiveinacitythatthecompanytheyareworkingforis not located in.
 *** Relational Algebra:
-    \pi_{person\_name} ( lives \join works \join (\pi_city (lives) X \pi_{company\_name}(works) - located))
+    \pi_{person\_name} ( lives \Join works \Join (\pi_city (lives) X \pi_{company\_name}(works) - located))
  
 *** Tuple Calculus:
     \{ p.person\_name | lives(p) \wedge \exists x \wedge works (x) \wedge \exists y \wedge located(y) ( p.person\_name = x.person\_name \wedge x.company\_name = y.company\_name \wedge y.city != p.city) \}
@@ -104,7 +122,7 @@ Formulate the following queries as expressions in relational algebra, tuple rela
  
 ** d) Find the names of all managers, whose company is not placed in Munich or Hamburg.
 *** Relational Algebra:
-    \pi_{manager\_name}(boss)-(\pi_{manager\_name}(boss \join \pi_{manager\_name=person\_name}(works) \join ( \sigma_{city='Munich'} (located) U \sigma_{city='Hamburg'}(located))))
+    \pi_{manager\_name}(boss)-(\pi_{manager\_name}(boss \Join \pi_{manager\_name=person\_name}(works) \Join ( \sigma_{city='Munich'} (located) U \sigma_{city='Hamburg'}(located))))
 
 *** Tuple Calculus:
     \{m.manger\_name | boss(m) \wedge \exists x \wedge located(x) \exists y \wedge works(y) (m.manager\_name = y.person\_name \wedge x.city = y.city \wedge y.city != 'Hamburg' \wedge y.city != 'Munich')\}
