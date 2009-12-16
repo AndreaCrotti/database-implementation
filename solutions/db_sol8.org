@@ -75,7 +75,7 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 ** a) Find name and city of all persons who work for the company 'MyComp' and earn less than 10000.
 *** Relational Algebra:
     \pi_{person\_name, city} (\sigma_{company\_name='MyComp'\wedge salary <10000} ( lives \join works)
-*** Tupel Calculus: {n.person\_name,n.city | lives(n) \wedge \exists y (\wedge works(y) n.person\_name = y.person\_name \wedge y.salary < 10000 \wedge y.company\_name='MyComp') }
+*** Tuple Calculus: {n.person\_name,n.city | lives(n) \wedge \exists y (\wedge works(y) n.person\_name = y.person\_name \wedge y.salary < 10000 \wedge y.company\_name='MyComp') }
 *** Domain Calculuis:
     {p,c | \exists st(lives(p,c,st)  \wedge \exists f,g (works(p,f,g) \wedge g < 10000))}
  
@@ -106,7 +106,7 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 *** Relational Algebra:
     \pi_{manager\_name}(boss)-(\pi_{manager\_name}(boss \join \pi_{manager\_name=person\_name}(works) \join ( \sigma_{city='Munich'} (located) U \sigma_{city='Hamburg'}(located))))
 
-*** Tupel Calculus:
+*** Tuple Calculus:
     \{m.manger\_name | boss(m) \wedge \exists x \wedge located(x) \exists y \wedge works(y) (m.manager\_name = y.person\_name \wedge x.city = y.city \wedge y.city != 'Hamburg' \wedge y.city != 'Munich')\}
 
 *** Domain Calculus:
@@ -116,9 +116,9 @@ Formulate the following queries as expressions in relational algebra, tuple rela
 
 ** e) Find the names of all companies that are located in exactly the same cities as 'MyComp', assuming each company is located in some city.
 *** Relational Algebra:
-    \pi_{company\_name} (\sigma_{C2='MyComp'\wedge city = city2}(located X p_{C2 \leftarrow company\_name}(p_{city2\leftarrwo company\_name (located))))
+    \pi_{company\_name} (\sigma_{C2='MyComp'\wedge city = city2}(located X p_{C2 \leftarrow company\_name}(p_{city2\leftarrow company\_name (located))))
 
-*** Tupel Calculus:
+*** Tuple Calculus:
     \{t(company\_name) | located (t) \wedge \neq (\exists l2)(located(l2) \wedge ( l2\[company\_name\] = t\[company\_name\]) \wedge \neq ((\exists myCL) (located(myCL) \wedge (myCL\[company\_name\] = 'MyComp') \wedge \neq(\exists l_2)(located(l_2) \wedge (l_2\[company\_name\] = t\[company\_name\]) \wedge (l_2\[city\] = myCL \[city\])))\}
 
 *** Domain Calculus:
