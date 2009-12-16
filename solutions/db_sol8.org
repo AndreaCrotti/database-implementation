@@ -77,6 +77,35 @@ EXERCISE 8
 
 * 2. Query Formulation (15 pt.)
 Formulate the following queries as expressions in relational algebra, tuple relational calculus, domain relational calculus and SQL:
+I used this schema to try the queries with sqlite:
+
+#+begin_src sql
+        CREATE TABLE lives(person_name PRIMARY KEY, city, street);
+        CREATE TABLE works(person_name PRIMARY KEY, company_name, salary);
+        CREATE TABLE located(company_name PRIMARY KEY, city);
+        CREATE TABLE boss(person_name PRIMARY KEY, manager_name);
+
+        insert into lives values(1, 'mantova', 'pippo');
+        insert into lives values(2, 'brescia', 'pippo');
+        insert into lives values(3, 'brescia', 'abc');
+        insert into lives values(4, 'Hamburg', 'abc');
+        insert into lives values(5, 'nonwork', 'df');
+
+        insert into works values(1, 'MyComp', 100);
+        insert into works values(2, 'BigComp', 200);
+        insert into works values(3, 'MyComp', 100000);
+        insert into works values(4, 'Ham', 200);
+
+        insert into located values('MyComp', 'brescia');
+        insert into located values('BigComp', 'verona');
+        insert into located values('Ham', 'Hamburg');
+
+        insert into boss values(1, 'firstboss');
+        insert into boss values(2, 'secondboss');
+        insert into boss values(4, 'third');
+#+end_src
+
+
 ** a) Find name and city of all persons who work for the company 'MyComp' and earn less than 10000.
 *** Relational Algebra:
 # FIXME: here we have a city also in works!
@@ -89,11 +118,10 @@ Formulate the following queries as expressions in relational algebra, tuple rela
     {p, c | \exists st(lives(p,c,st)  \wedge \exists f,g (works(p,f,g) \wedge g < 10000))}
 
 *** SQL
-
-# the join is done in the from (can be explicited also
+    Using an explicit join on the person_name attribute
 #+begin_src sql
-    select distinct person_name, city from (lives, works)
-    where (works.salary < 10000 and works.company_name='MyComp')
+    select p.person_name, city from lives p join works w on p.person_name=w.person_name
+    where (w.salary < 10000 and w.company_name='MyComp')
 #+end_src
     
 ** b) Find the names of all persons, who don't work for 'MyComp' (or do not work at all).
@@ -107,14 +135,17 @@ Formulate the following queries as expressions in relational algebra, tuple rela
     \{name | lives(name, _ , _) \wedge works(name, comp, _) \wedge comp != 'MyComp'\}
 
 *** SQL
+    First I take all the elements that don't work for any company and put them together with persons that don't work for 'MyComp'.
 
-# FIXME: Also consider case where they don't work at all
 #+begin_src sql
-    select lives.person_name from (lives, works)
-    where (works.person_name != 'MyComp'
+    select person_name from lives
+    except
+    select person_name from works
+    union
+    select lives.person_name from lives join works on lives.person_name=works.person_name
+    where (works.company_name <> 'MyComp')
 #+end_src
 
- 
 ** c) Find the names of all persons, who live in a city that the company they are working for is not located in.
 *** Relational Algebra:
     \pi_{person\_name} ( lives \Join works \Join (\pi_city (lives) X \pi_{company\_name}(works) - located))
@@ -126,10 +157,11 @@ Formulate the following queries as expressions in relational algebra, tuple rela
     \{ p | lives (p,c,st) \wedge \exists works (p,f,g) \wedge \exists located(f,c_1) \wedge c != c_1
 
 *** SQL
-
+    Here we concatenate 2 joins on the person and on the company_name.
 #+begin_src sql
-    select lives.person_name from (lives, works)
-    where lives.city <> works.city
+    select p.person_name,p.city from lives p join works w on p.person_name=w.person_name
+    join located l on w.company_name=l.company_name
+    where l.city <> p.city;
 #+end_src
  
 ** d) Find the names of all managers, whose company is not placed in Munich or Hamburg.
@@ -137,16 +169,19 @@ Formulate the following queries as expressions in relational algebra, tuple rela
     \pi_{manager\_name}(boss)-(\pi_{manager\_name}(boss \Join \pi_{manager\_name=person\_name}(works) \Join ( \sigma_{city='Munich'} (located) U \sigma_{city='Hamburg'}(located))))
 
 *** Tuple Calculus:
-    \{m.manger\_name | boss(m) \wedge \exists x \wedge located(x) \exists y \wedge works(y) (m.manager\_name = y.person\_name \wedge x.city = y.city \wedge y.city != 'Hamburg' \wedge y.city != 'Munich')\}
+    \{m.manager\_name | boss(m) \wedge \exists x \wedge located(x) \exists y \wedge works(y) (m.manager\_name = y.person\_name \wedge x.city = y.city \wedge y.city != 'Hamburg' \wedge y.city != 'Munich')\}
 
 *** Domain Calculus:
     \{ m | \exists p (boss (p,m) \ exists f,s located(f,s) \exists g (works (m,f,g) \wedge s != 'Munich' \wedge s != 'Hamburg'))\}
 
 *** SQL
+    Three join and one condition.
 
 #+begin_src sql
-    select m.manager_name from (boss m, lives p, works w)
-    where (w.city <> 'Munich' and w.city <> 'Hamburg')
+    select m.manager_name
+    from boss m join works w on m.person_name=w.person_name
+    join located l on l.company_name=w.company_name
+    where l.city <> 'Hamburg'
 #+end_src
 
 ** e) Find the names of all companies that are located in exactly the same cities as 'MyComp', assuming each company is located in some city.
@@ -157,10 +192,15 @@ Formulate the following queries as expressions in relational algebra, tuple rela
     \{t(company\_name) | located (t) \wedge \neq (\exists l2)(located(l2) \wedge ( l2\[company\_name\] = t\[company\_name\]) \wedge \neq ((\exists myCL) (located(myCL) \wedge (myCL\[company\_name\] = 'MyComp') \wedge \neq(\exists l_2)(located(l_2) \wedge (l_2\[company\_name\] = t\[company\_name\]) \wedge (l_2\[city\] = myCL \[city\])))\}
 
 *** Domain Calculus:
-    \{ f | \exists s(located(f,s) \wedge located(myCompany, s) \wedge myComapny = 'MyComp')}
+    \{ f | \exists s(located(f,s) \wedge located(myCompany, s) \wedge myCompany = 'MyComp')}
  
 *** SQL
-
+    Innested selection used to get the location of 'MyComp', we also remove the trivial case where company is 'MyComp' in the end.
 #+begin_src sql
-    
+    select l.company_name
+    from located l
+    where l.city = (
+          select city from located
+          where company_name='MyComp')
+          and l.company_name <> 'MyComp'
 #+end_src
