@@ -1,0 +1,17 @@
+EXERCISE 9
+#+SETUPFILE: options.org
+#+OPTIONS: \n:nil
+
+* Exercise 9.1[Tableau Containment] :
+
+* Exercise 9.2[Tableau Minimization] :
+
+* Exercise 9.3[Join Ordering] :
+
+** 1
+
+** 2
+
+** 3
+
+** 4
