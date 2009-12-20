@@ -1,20 +1,30 @@
+Latex and org-mode
 #+OPTIONS: toc:nil
-Latex for org-(ab)users
-[[http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf][list of all latex symbols]]
+* Intro
+  For writing technical documentations latex is of course the best choice.
+  [[http://orgmode.org/][orgmode]] is an emacs extensions which (between the other things) can also be very well used for writing technical documents.
+
+  It can exports into many different formats, and the syntax is very neat and simple.
+  As for latex source files it's just text, but unless you're doing specific things in an org-file you can avoid all the /bureaucracy/.
+  
+  The various
+  ~\usepackage~ are automatically generated.
 
 * Some symbols
-| \sigma      | =\sigma=      |
-| \pi         | =\pi=         |
-| \Join       | =\Join=       |
-| \in         | =\in=         |
-| \notin      | =\notin=      |
-| \wedge      | =\wedge=      |
-| \vee        | =\vee=        |
-| \exists     | =\exists=     |
-| \nexists    | =\nexists=    |
-| \forall     | =\forall=     |
-| \rightarrow | =\rightarrow= |
-| \leftarrow  | =\leftarrow=  |
+  This is just a small list of useful latex symbols, here you find the [[http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf][list of all latex symbols]]
+
+  | \sigma      | =\sigma=      |
+  | \pi         | =\pi=         |
+  | \Join       | =\Join=       |
+  | \in         | =\in=         |
+  | \notin      | =\notin=      |
+  | \wedge      | =\wedge=      |
+  | \vee        | =\vee=        |
+  | \exists     | =\exists=     |
+  | \nexists    | =\nexists=    |
+  | \forall     | =\forall=     |
+  | \rightarrow | =\rightarrow= |
+  | \leftarrow  | =\leftarrow=  |
 
 * Arguments
   Sometimes you need to give arguments to functions.
