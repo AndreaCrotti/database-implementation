@@ -3,6 +3,38 @@ EXERCISE 9
 #+OPTIONS: \n:nil
 
 * Exercise 9.1[Tableau Containment] :
+  - D1 :{<a1,a2> | \exists b1 \exists b2(R(a1,b1) \wedge R(b2,a2) \wedge R(b1,5) \wedge R(5,b2))} \\
+  - D2 :{<a1,a2> | \exists b1 \exists b2\exists b3\exists b4(R(a1,b2) \wedge R(a1,b4) \wedge R(b1,a2) \wedge R(b2,b3) \wedge R(b4,b3) \wedge R(b3,b1))}
+
+# Also add the result row somehow, not sure that it is so simple
+** 1.
+*** T1
+    | a1 | a2 |
+    |----+----|
+    | a1 | b1 |
+    | b2 | a2 |
+    | r1 | 5  |
+    | 5  | b2 |
+    |----+----|
+    | 5  | 5  |
+
+*** T2
+    | a1 | a2 |
+    |----+----|
+    | a1 | b2 |
+    | a1 | b4 |
+    | b1 | a2 |
+    | b2 | b3 |
+    | b4 | b3 |
+    | b3 | b1 |
+
+** 2.
+   To check if one is included in the other we must check that:
+   - T1, T2 have the same columns and entries in result rows.
+   - the relation computed from T1 is a subset of the one from T2 for all valid assignments of relations to rows.
+
+*** T1 \subseteq T2:
+    
 
 * Exercise 9.2[Tableau Minimization] :
 
