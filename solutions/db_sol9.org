@@ -19,8 +19,8 @@ EXERCISE 9
     | b2 | a2 |
     | r1 | 5  |
     | 5  | b2 |
-    |----+----|
-    | 5  | 5  |
+#   |----+----|
+#   | 5  | 5  |
 
 *** T2
     | a1 | a2 |
@@ -36,16 +36,52 @@ EXERCISE 9
    To check if one is included in the other we must check that:
    - T1, T2 have the same columns and entries in result rows.
    - the relation computed from T1 is a subset of the one from T2 for all valid assignments of relations to rows.
-
+   
+   So we check the 2 possible cases and looking for a mapping.
+   h(a1) = h(a2) = 5
 *** T1 \subseteq T2:
+    We must find a function /h/ that maps all the rows from T1 to T2.
+    h(resulting_row(T2)) = resulting_row(T1)
+# Not really sure about this
+    I can start to define the following values for the function.
+    - h(b2) = b1
+    - h(b4) = b1
+    - h(b1) = b2
+    - h(b3) = a2
+    - h(b4) = b2
+    - h(b3) = a1
     
-*** T1 \subseteq T2:
+    But then applying the function h I would get the tuples (b1, a2) and (a1, b2) which are not in T1.
 
+    | a1 | a2 |
+    |----+----|
+    | a1 | b1 |
+    | a1 | b1 |
+    | b2 | a2 |
+    | b1 | a2 |
+    | b2 | a2 |
+    | a1 | b2 |
+    
+    So $T1 \nsubseteq T2$
 
+*** T2 \subseteq T1:
+    We start by defining
+    - h(b1) = b2
+    - h(a2) = b3
+
+    But there are no ways to map the constant value in T2, so \\
+    T2 \nsubseteq T1.
+    
+    
 * Exercise 9.2[Tableau Minimization] :
-  $\pi_{A,B}(\sigma_{B=5}(R)) \Join \pi_{B,C} (\pi_{A,B}(R) \Join \pi_{A,C}(\sigma_{b=5}(R)))$
+  $\pi_{A,B}(\sigma_{B=5}(R)) \Join \pi_{B,C} (\pi_{A,B}(R) \Join \pi_{A,C}(\sigma_{B=5}(R)))$
+
+  This query is redundant since as we can see the condition on B=5 is checked twice.
+  We will end up doing a \Join of two identical set of tuples, the second part of the query is useless.
 
 ** 1. Translate the RA into a tableau query
+   To write the corresponding tableau we need first to translate the RA query in DRC.
+   
 
 ** 2. Perform tableau minimization over the result obtained from the previous task.
 
@@ -65,6 +101,7 @@ EXERCISE 9
   WHERE R.sid = S.sid AND B.bid=R.bid AND B.color=’red’
 #+end_src
 
+# For selectivity computation the formulas that we used in the last assignment are correct
 
 ** 1. What is the selectivity of joining Reserves and Sailors?
 
