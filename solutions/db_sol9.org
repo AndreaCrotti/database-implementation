@@ -19,8 +19,6 @@ EXERCISE 9
     | b2 | a2 |
     | r1 | 5  |
     | 5  | b2 |
-#   |----+----|
-#   | 5  | 5  |
 
 *** T2
     | a1 | a2 |
@@ -74,18 +72,38 @@ EXERCISE 9
     
     
 * Exercise 9.2[Tableau Minimization] :
-  $\pi_{A,B}(\sigma_{B=5}(R)) \Join \pi_{B,C} (\pi_{A,B}(R) \Join \pi_{A,C}(\sigma_{B=5}(R)))$
+  \pi_{A,B}(\sigma_{B=5}(R)) \Join \pi_{B,C} (\pi_{A,B}(R) \Join \pi_{A,C}(\sigma_{B=5}(R)))
 
   This query is redundant since as we can see the condition on B=5 is checked twice.
-  We will end up doing a \Join of two identical set of tuples, the second part of the query is useless.
+  We will end up doing a /Join/ of two identical set of tuples, the second part of the query is useless.
 
 ** 1. Translate the RA into a tableau query
-   To write the corresponding tableau we need first to translate the RA query in DRC.
+   To write the corresponding tableau we need first to translate the RA query in DRC. \\
+   The DRC formula is: \\
+   $\{\langle A,B \rangle | \exists (a1,a2,a3,b1,b2,b3,b4,c1,c2) \wedge R(a1,b1) \wedge R(b2,c1) \wedge R(a2,b3) \wedge R(a3,c2) \wedge \{b1 = 5 \wedge b4 = 5\}\}$
    
+   And the tableau:
+   | A  | B  |
+   |----+----|
+   | a1 | b1 |
+   | b2 | c1 |
+   | a2 | b3 |
+   | a3 | c2 |
+   | b1 | 5  |
+   | b5 | 5  |
 
 ** 2. Perform tableau minimization over the result obtained from the previous task.
+# Should do a really do a tableau minimization as given at page 31 of the slides
+# "For each tableau row: Delete the row and check equivalence to original tableau."
+   To minimize the tableau we iteratively delete one row and check if it's still equal to the original tableau.
+
+   After a few steps we get:
+   | A  | B |
+   |----+---|
+   | a1 | 5 |
 
 ** 3. Translate the minimized tableau back to RA.
+   \pi_{A,B}(\sigma_{B=5}(R))
 
 
 * Exercise 9.3[Join Ordering] :
