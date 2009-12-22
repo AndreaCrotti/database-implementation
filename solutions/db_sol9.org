@@ -61,7 +61,7 @@ EXERCISE 9
     | b2 | a2 |
     | a1 | b2 |
     
-    So $T1 \nsubseteq T2$
+    So T1 \nsubseteq T2
 
 *** T2 \subseteq T1:
     We start by defining
