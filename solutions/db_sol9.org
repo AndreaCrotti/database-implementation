@@ -36,7 +36,8 @@ EXERCISE 9
    - the relation computed from T1 is a subset of the one from T2 for all valid assignments of relations to rows.
    
    So we check the 2 possible cases and looking for a mapping.
-   h(a1) = h(a2) = 5
+   Where not specified otherwise /h/ is the identity (maps a1 to a1 for example).
+
 *** T1 \subseteq T2:
     We must find a function /h/ that maps all the rows from T1 to T2.
     h(resulting_row(T2)) = resulting_row(T1)
@@ -105,13 +106,15 @@ EXERCISE 9
 ** 3. Translate the minimized tableau back to RA.
    \pi_{A,B}(\sigma_{B=5}(R))
 
-
+   
 * Exercise 9.3[Join Ordering] :
 
   Sailors(sid, sname, rating, age)
   Boats(bid, bname, color) Reserves(sid, bid, day, rname) \\
   We assume that each tuple of Reserves is 40 bytes long, a page can hold 100 Reserves tuples, and we have 1000 pages of such tuples. \\
-  In addition, we know the following statistics: • There are five different colors for boats. • V(Reserves, sid) = 1500 and V(Reserves, bid) = 1000 \\
+  In addition, we know the following statistics: \\
+  - There are five different colors for boats. \\
+  - V(Reserves, sid) = 1500 and V(Reserves, bid) = 1000 \\
   We also know that sid is a key for Sailors, while bid is a key for Boats.
 
 #+begin_src sql
@@ -131,3 +134,4 @@ EXERCISE 9
    For the cost estimation, use the sum of the sizes of all intermediate relations, not including the base relations themselves or the join result of the current full subset of relations under consideration for each subplan.
    For simplicity, size of an intermediate relation is assumed to be the cardinality of it, i.e., ignoring the differences in tuple length.
    We further assume selection is pushed down the plan before joining1.
+ 
