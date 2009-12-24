@@ -13,6 +13,8 @@ Latex and org-mode
 * Some symbols
   This is just a small list of useful latex symbols, here you find the [[http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf][list of all latex symbols]]
 
+  | SYMBOL      | LITERAL       |
+  |-------------+---------------|
   | \sigma      | ~\sigma~      |
   | \pi         | ~\pi~         |
   | \Join       | ~\Join~       |
@@ -30,6 +32,9 @@ Latex and org-mode
   | \subsetneq  | ~\subsetneq~  |
   #+TBLFM: $2='(concat "~" $1 "~")
 
+* Literal latex code
+  You can also insert some literal code
+
 * Arguments
   Sometimes you need to give arguments to functions.
   In general we use =_= for lower indexes, =^= for exponents and () for arguments.
@@ -39,7 +44,6 @@ Latex and org-mode
 
   | \log_x^2              | =\log_x^2=              |
   | \sigma_{A,B}(\pi_C R) | =\sigma_{A,B}(\pi_C R)= |
-
 
 * Quoting
   Latex has some key characters that have a special meaning.

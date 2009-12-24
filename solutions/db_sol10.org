@@ -1,0 +1,21 @@
+EXERCISE 10
+#+SETUPFILE: options.org
+
+* Exercise 10.1[Query optimization]:
+# Insert here the text of   
+
+** 1.
+
+** 2.
+
+*** a)
+
+*** b)
+
+*** c)
+
+*** d)
+
+*** e)
+
+** 3.
