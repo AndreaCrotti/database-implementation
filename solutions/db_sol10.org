@@ -17,15 +17,26 @@ EXERCISE 10
    GROUP BY gift.name, supplier.name
 #+end_src
 
+    We first count how many tuples we could have in total.
+    #shipment = #gift * #employee * #supplier = 6000 * 10000 * 500 = 3 * 10^10
+    the general join is gift \Join supplier \Join shipment
+    So #tuples = 10^10
+
 *** a) The selection (IN expression) on supplier.place
+    We know that there are 50 different nationalities, assuming that they are uniformly distributed we get
+    S = 1/50
 
-*** b) The selection on git.price
+*** b) The selection on gift.price
+    Prices are equally distributed in the range (11, 210). \\
+    Choosing gift.price > 190 we get \\
+    $S = (210 - 190) / (210 - 11) \approx 1/10$
 
-*** c) The join on shipment.gift and gift.gift_id
+*** c) The join on shipment.gift and gift.gift\_id
+    
 
-*** d) The join on shipment.supplier and supplier.supplier_id
+*** d) The join on shipment.supplier and supplier.supplier\_id
 
-*** e) The join on employee.place and place.place_id
+*** e) The join on employee.place and place.place\_id
 
 ** 2. Sketch a query plan for this query that would result in the minimum amount of work given no indices and the selectivity estimates you gave above.
 
