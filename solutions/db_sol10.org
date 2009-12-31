@@ -5,17 +5,28 @@ EXERCISE 10
 # Insert here the text of   
 
 ** 1.
+   
+#+begin_src sql
+   SELECT gift.name, supplier.name, COUNT(*)
+   FROM gift, supplier, shipment
+   WHERE shipment.gift = gift.gift_id AND shipment.supplier = supplier.supplier_id
+   AND gift.price > 190 AND supplier.place IN
+   (SELECT DISTINCT place.place_id
+   FROM employee, place
+   WHERE employee.place = place.place_id AND employee.nationality = ’German’ )
+   GROUP BY gift.name, supplier.name
+#+end_src
 
-** 2.
+*** a) The selection (IN expression) on supplier.place
 
-*** a)
+*** b) The selection on git.price
 
-*** b)
+*** c) The join on shipment.gift and gift.gift_id
 
-*** c)
+*** d) The join on shipment.supplier and supplier.supplier_id
 
-*** d)
+*** e) The join on employee.place and place.place_id
 
-*** e)
+** 2. Sketch a query plan for this query that would result in the minimum amount of work given no indices and the selectivity estimates you gave above.
 
-** 3.
+** 3. Reccommend a set of indices that will improve the performance of this query at most

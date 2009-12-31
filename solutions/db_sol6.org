@@ -2,8 +2,7 @@ EXERCISE 6
 #+SETUPFILE: options.org
 #+OPTIONS: \n:t
 
-* TODO 
- DEADLINE: <2009-12-02 Mer 12:15>
+* DEADLINE: <2009-12-02 Mer 12:15>
 
 * 1. Selection and projection
 ** 1. Given the size of a relation (1000 pages), what are the I/O costs for an equality selection on a non-key attribute for the following cases? Assuming each B-tree leaf holds 20 record pointers while each page contains 10 records
