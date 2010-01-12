@@ -27,9 +27,12 @@ EXERCISE 10
     We know that there are 50 different nationalities, assuming that they are uniformly distributed we get: \\
     With the line /SELECT DISTINCT place.place\_id/ we get a selectivity of 1/1000, which are the number of possible disinct places.
 
-    Then we filter on the nationality and assuming they are equally distributed we filter 1/50.
-    So the selectivity of the IN expression is: \\
-    $1/50 * 1/1000 = 1/50000$
+    But we also have a filter on the nationality, assuming the cities are equally distributed we have to divide the places by the number of nationalities.
+    $selectivity = 1/(1000/50) = 1/200$
+    
+#    Then we filter on the nationality and assuming they are equally distributed we filter 1/50.
+#    So the selectivity of the IN expression is: \\
+#    $1/50 * 1/1000 = 1/50000$
 
 *** b) The selection on gift.price
     Prices are equally distributed in the range (11, 210). \\
