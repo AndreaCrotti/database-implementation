@@ -4,8 +4,14 @@
 # to check if optimization are actually working or not
 # relational algebra operations can be checked using dictionaries and sets
 
+# to test the performance you can do
+# time sqlite3 -batch <filename> "query"
+# or time inside python
+
 import sqlite3
 import random
+import timeit
+import doctest
 
 db_file = "ex10_1.db"
 # otherwise I can also use the memory
