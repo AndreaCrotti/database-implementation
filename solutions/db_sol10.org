@@ -51,7 +51,7 @@ EXERCISE 10
 *** e) The join on employee.place and place.place\_id
     $selectivity = 1 / 1000$ (the number of employees)
 
-** 2. Sketch a query plan for this query that would result in the minimum amount of work given no indices and the selectivity estimates you gave above.
+** 2. Sketch a query plan for this query that would result in the minimum amount of work given no indices and the selectivity estimates you gave above. Be sure to indicate what join algorithm you would use for each join. Assume you have sufficient memory to fit all relations and any intermediate data structures in memory.
    A query plan is a particular way to plan the query.
    A query plan (or query execution plan) is a set of steps used to access or modify information in a SQL relational database management system.
    Given the declarativity of SQL there are many different ways to execute a query.
@@ -59,6 +59,12 @@ EXERCISE 10
 # In general as "database systems page 809" says you should push selections as far as possible in the query plan.
 # Given the computed selectivity factors find the a way to minimize the number of I/O operations needed.
 # see "choosing an order for joins page 814"
+
+#+begin_src dot :file db_10_2.pdf :cmdline -Tpdf :exports none :results silent
+   
+#+end_src
+
+   [[file:db_10_2.pdf]]
 
 ** 3. Reccommend a set of indices that will improve the performance of this query at most
 # nice stuff about indexes in chapter 14 of "Fundamentals of databases"
