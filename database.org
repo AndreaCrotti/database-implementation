@@ -109,3 +109,28 @@
   
 ** Clustered relation
    A relation is /clustered/ if its tuples are packed into roughly as few blocks as possibly hold those tuples.
+
+* Indexing
+  Indexes are used to speed up the retrieval of records in response to certain search conditions.
+  /Any field/ could be used to construct the index.
+  
+  Three kinds of indexes are:
+  - primary (used on ordering fields)
+  - secondary
+  - clustering
+
+  Index can also be *dense* or *sparse*, depending by the number of entries that it has for /every search key value/.
+
+** Clustering
+   A clustering index instead does not have one entry for every possible value, but it points to a file which contains all the records where the field has that value.
+   In this case records are phisically ordered, so we can have some problems in insertion / deletion, that's why we normally reserve one entire block for /each value/ of the clustering field.
+   
+** Secondary
+   A *secondary index* provides a secondary means of accessing a file for which some primary access already exists.
+   It's useful to work on an arbitrary number of tuples since otherwise we should search in linear time.
+
+** Multilevel indexes
+
+*** Multilevel indexes using B-Trees and B^{+}-Trees
+    
+    
