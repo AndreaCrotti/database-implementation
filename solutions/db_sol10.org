@@ -59,6 +59,16 @@ EXERCISE 10
 # In general as "database systems page 809" says you should push selections as far as possible in the query plan.
 # Given the computed selectivity factors find the a way to minimize the number of I/O operations needed.
 # see "choosing an order for joins page 814"
+   
+   # I don't know how to draw graph using this.. So I write it down for the time being.
+   First do the selection: employee.nationality = ’German’. Then operate the join: employee.place = place.place_id. Then the selection: supplier.place IN (...). 
+   Parallelly with the above operation, excute the selection: gift.price > 190. 
+   Then join gift and supplier where gift.supplier = supplier.supplier_id. 
+   Then join the result with shipment, where gift.gift_id = shipment.gift.
+   At last excute the grouping. 
+   # should the two grouping operation have an order? 
+
+For all the joins, provided we have enough memory space, we use Block Nested Loop join algorithm. We could load as many pages of the bigger relation as can be fit in the available memory, and load all such tuples into a hash table, then repeatedly scans the smaller relation. It is the cheapest one when we have enough large input buffer.
 
 #+begin_src dot :file db_10_2.pdf :cmdline -Tpdf :exports none :results silent
    
