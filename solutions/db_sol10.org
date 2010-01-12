@@ -68,7 +68,7 @@ EXERCISE 10
    At last excute the grouping. 
    # should the two grouping operation have an order? 
 
-For all the joins, provided we have enough memory space, we use Block Nested Loop join algorithm. We could load as many pages of the bigger relation as can be fit in the available memory, and load all such tuples into a hash table, then repeatedly scans the smaller relation. It is the cheapest one when we have enough large input buffer.
+For all the joins, provided we have enough memory space, we use Block Nested Loop join algorithm. We could load as many pages of the bigger relation as can be fit in the available memory, and load all such tuples into a hash table, then repeatedly scans the smaller relation. It is the cheapest way when we have enough large input buffer.
 
 #+begin_src dot :file db_10_2.pdf :cmdline -Tpdf :exports none :results silent
    
