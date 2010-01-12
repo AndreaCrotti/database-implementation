@@ -58,8 +58,12 @@ EXERCISE 10
 
 # In general as "database systems page 809" says you should push selections as far as possible in the query plan.
 # Given the computed selectivity factors find the a way to minimize the number of I/O operations needed.
-   
+# see "choosing an order for joins page 814"
 
 ** 3. Reccommend a set of indices that will improve the performance of this query at most
-# In general we should create a clustered hash index for equalities and a b+tree index for >< values
+   In general we should create a clustered hash index for equalities and a b+tree index for attributes involved in inequalities.
+   - clustered hash index on place.place_id
+   - clustered hash index on gift.gift_id
+   - clustered b+tree index on gift.price
+   - clustered hash index on employee.nationality
 
