@@ -137,3 +137,34 @@
    "Database the complete book" contains many informations about it.
    Otherwise there's a paper on l2p about it.
    In join we should use the smaller relation as outer relation.
+
+
+* Deductive database
+** Intro
+   Some queries can't be expressed by SQL or RA, for example:
+   - Give me a list of all known ancestors of "John Doe"
+   (Recursion is needed in those cases)
+
+** Elements
+   The elements are
+   - Rules (which are *horn clauses*)
+   - Queries
+   - Constraints (also facts, that are true)
+   
+   Variables can be free or bounded.
+   P(X, Y) :- R(X, Z), R(Y,Z).
+   Here /X/ is bound but Z is free.
+   
+   - Theory:
+     schema + integrity constraints
+   - Interpretation:
+     database state
+   
+** Semantics of a deductive database
+   A deductive database D = (F, R)
+   F* is the implicit relation.
+   - Is F* uniquely determinable?
+   - What meaning of /derivable/?
+   
+   F* is the *minimal Herbrand Model* of D.
+   

@@ -30,8 +30,17 @@ EXERCISE 11
   link(1,12) link(2,12) link(2,23) link(3,23) link(12,127) link(7,127) link(0,1)
 #+end_src
 
-** 1.
+** 1. Evaluate the query using semi-naive bottom-up approach.
+# For Naive see chapter 3 pag. 12
 
-** 2.
+** 2. Evaluate the query using top-down approach. Draw the proof tree
+#+begin_src dot :file es11_2_1 :cmdline -Tpdf :exports none :results silent
+   digraph G {
+	   top [label = "q(X) :- rel(12,X)"];
+	   
+   }
+#+end_src
+   
+   [[file:es11_2_1]]
 
-** 3.
+** 3. What are the pros and cons of top-down evaluation and bottom-up evaluation?
