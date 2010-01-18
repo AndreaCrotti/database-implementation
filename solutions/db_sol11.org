@@ -1,0 +1,37 @@
+EXERCISE 11
+#+SETUPFILE: options.org
+
+* Exercise 11.1
+  Datalog program D without negation, prove the following:
+
+** 1.
+
+** 2.
+
+** 3.
+
+** 4.
+
+** 5.
+
+** 6.
+
+** 
+
+* Exercise 11.2
+  Given the following Datalog program and the query q(X) :− rel(12,X).
+
+#+begin_src prolog
+  %% Rule system
+  rel(X,U) :- link(X,U).
+  rel(X,U) :- link(X,Z),rel(Z,U).
+  tie(X,Y) :- rel(X,U),rel(Y,U),x<>y.
+  %% Facts
+  link(1,12) link(2,12) link(2,23) link(3,23) link(12,127) link(7,127) link(0,1)
+#+end_src
+
+** 1.
+
+** 2.
+
+** 3.
