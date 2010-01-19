@@ -33,6 +33,11 @@ EXERCISE 11
 ** 1. Evaluate the query using semi-naive bottom-up approach.
 # For Naive see chapter 3 pag. 26 and page 30
    We generate also all implicit facts that are not useful.
+     rel (1,12), rel (1,127), rel (2,12), rel (2,127), rel (2,23), rel (3,23), rel (12, 127), rel (7,127), rel (0,1),   
+     rel (0,12), rel (0,127)
+
+   The answer to the query is: X= 127.
+
 #+begin_src dot :file es11_2_1.pdf :cmdline -Tpdf :exports none :results silent
    digraph G {
    t0 [ label = "link(1,12)" ];
