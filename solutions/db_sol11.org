@@ -34,7 +34,9 @@ EXERCISE 11
 # For Naive see chapter 3 pag. 26 and page 30
    We generate also all implicit facts that are not useful.
      rel (1,12), rel (1,127), rel (2,12), rel (2,127), rel (2,23), rel (3,23), rel (12, 127), rel (7,127), rel (0,1),   
-     rel (0,12), rel (0,127)
+     rel (0,12), rel (0,127).
+     tie (1,2), tie (0,1), tie (0,2), tie (2,1), tie (1,0), tie (2,0), (12,7), tie (7,12), tie (0,7), tie (7,0),
+     tie (1,7), tie (7,1), tie (2,7), tie (7,2), tie (2,3), tie (3,2).
 
    The answer to the query is: X= 127.
 
