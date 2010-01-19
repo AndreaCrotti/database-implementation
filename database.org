@@ -168,3 +168,8 @@
    
    F* is the *minimal Herbrand Model* of D.
    
+** Possible evaluation strategies
+   - Backward/derivation/top down (as in prolog):
+     efficient selection (unification) but possibly not terminating
+   - Forward/generation/bottom up (databases):
+     Finite sequence of algebraic manipulations, but possibly large unnecessary results
