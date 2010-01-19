@@ -54,7 +54,7 @@ EXERCISE 11
 #+begin_src dot :file es11_2_2.pdf :cmdline -Tpdf :exports none :results silent
    digraph G {
 	   t0 [ label = "q(X) :- rel(12,X)" ];
-	   t1 [ label = "rel(12, U) :- link(12, U) [X/12]" ];
+	   t1 [ label = "rel(12, U) :- link(12, U) [X/12]\n(we apply the rules in the given order)" ];
            t2 [ label = "link(12,127) [U/127]" ];
            t3 [ color="red", shape="box", label = "verified, so X = 127" ];
            t0 -> t1 -> t2 -> t3;
@@ -62,9 +62,10 @@ EXERCISE 11
 #+end_src
    
    [[file:es11_2_2.pdf]]
-
+   
 ** 3. What are the pros and cons of top-down evaluation and bottom-up evaluation?
    Top-down evaluation starts from the query and try to reach a fact constructing a tree, and using backtracking until all the possible branches have been explored.
    It unifies variables at every step and it's very efficient if the query is well posed, but it could be very inefficient (or not terminate) in case some subtrees don't lead to a leaf.
 
-   Bottom up evaluation instead
+   Bottom up evaluation instead generates will try a finite number of algebraic steps to derive the goal.
+   This will always terminate but in this process it will generate a large amount of implicit facts that could be avoided.
