@@ -4,11 +4,24 @@ EXERCISE 11
 * Exercise 11.1
   Datalog program D without negation, prove the following:
 
-** 1.
+** 1. We assume M1 \bigcap is not a model.
+    Then there is a ground rule r: A \leftfree A1, A2,...An, which is false. A and Ai are positive literals.
+    r is false means that Ai is in M1 \bigcap M2 while A is not.
+    So we get Ai \in M1 and Ai \in M2.
+    Since M1 is a model, A should also be in M1. So the rule r is true in M1.
+    The same we get A \in M2 too.
+    There is a contradiction with the assumption that A \notin M1 \bigcap M2, which means M1 \bigcap M2 is a model.
 
-** 2.
+** 2. We assume there are more than one minimal models, Let's say M1 \nequal M2.
+    According to 1, we get M = M1 \bigcap M2 is also a model.
+    So we could get that M \subset M1 or M \subset M2 since M1 \nequal M2.
+    Thus M1 or M2 is not minimal. There is a contradiction.
 
-** 3.
+** 3. We assume F is a fixpoint, but not a model.
+    So TD(F) = F and there is a ground rule r: A \leftfree A1, A2,...An, that is false in F.
+    Then F \vDash Ai \wedge F \nvDash A.
+    Consider TD(F) and r, by definition of immediate consequence operator we get that TD(F) \vDash A.
+    TD(F) \nequal F, this is a contradiction.
 
 ** 4.
 
