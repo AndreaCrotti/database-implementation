@@ -6,7 +6,7 @@ EXERCISE 11
 
 ** 1. If M1 and M2 are models ofD,then $M1 \bigcap M2$ is also a model of D.
    We assume M1 is not a model.
-   Then there is a ground rule r: A \\leftarrow A1, A2,...An, which is false. A and Ai are positive literals.
+   Then there is a ground rule r: $A \leftarrow A1, A2,...An$ , which is false. A and Ai are positive literals.
    r is false means that Ai is in $M1 \bigcap M2$ while A is not. \\
    So we get $Ai \in M1$ and $Ai \in M2$. \\
    Since M1 is a model, A should also be in M1. So the rule r is true in M1.

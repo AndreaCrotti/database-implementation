@@ -138,6 +138,11 @@
    Otherwise there's a paper on l2p about it.
    In join we should use the smaller relation as outer relation.
 
+** Possible heuristics
+   1. size of intermediate relations
+   2. selections should be pushed down in the tree (even if in some cases it's not better)
+   3. most restrictive joins first
+   4. postpone joining of large relations
 
 * Deductive database
 ** Intro

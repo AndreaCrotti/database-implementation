@@ -1,0 +1,23 @@
+EXERCISE 12
+#+SETUPFILE: "options.org"
+
+
+* Exercise 12.1
+
+** 1.
+
+** 2.
+
+** 3.
+
+** 4.
+
+** 5.
+
+* Exercise 12.2
+
+** 1.
+
+** 2.
+
+** 3.
