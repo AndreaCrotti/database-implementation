@@ -17,7 +17,12 @@ EXERCISE 12
 * Exercise 12.2
 
 ** 1.
+// we have it in last year exercise 7.3. please type it in? :P
 
 ** 2.
 
-** 3.
+** 3. First we do the projection of r on Y, then ship the projection result to site B.
+Then we do natural join of the projection and relation s, then we get a reduction of s with respect to r.
+Then we ship the reduction of s to site A, and compute the natural join of the reduction and r.
+
+The total transmition is the size of the tuples of the projection on Y in r, plus the size of the reduction of s with respect to r.
