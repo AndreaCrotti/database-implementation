@@ -6,7 +6,11 @@ EXERCISE 12
 
 ** 1. (0,1,P), (0,2,P), (2,0,D), (1,0,R), (0,2,A), (0,1,A)
 
-** 2. 12
+** 2. (0,1,P),(0,2,P),(2,0,R),(1,0,R),(0,2,C),(0,1,C)
+In the first phase, we first calculate the permutation of the first 4 messages, so that we have 4! = 4*3*2*1 = 24.
+Since it is not possible to have response of a site before sending "prepare" to it. So the order of (0,1,P) and (1,0,R) is fixed. The same applies to site 2. So we get the permutation in the first phase as 4! / (2! * 2!) = 6.
+In the second phase we have 2 posible sequenses, which are (0,2,C),(0,1,C) or (0,1,C),(0,2,C).
+So we get the total number of possible sequences as 6 * 2 = 12
 
 ** 3. 24
 
