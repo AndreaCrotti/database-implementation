@@ -21,9 +21,10 @@ Third situation, we have a sequence as : (0,2,P), (2,0,D), (0,1,P), (), (), (). 
 
 In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 
-** 4. 6
+** 4. There is no response from site 2. So we only have 3 messages in the first phase, and 2 messages in the second phase. Since the order of (0,1,P) and (1,0,R) is fixed. So we have the total permutation as (3! / 2!) * 2! = 6.
 
-** 5. (2n! * n!)/2^n
+** 5. According to the method we use for the calculation of question 2, we can summarize it to be :
+((2n)! / (2!)^n) * (n!)
 
 * Exercise 12.2
 
