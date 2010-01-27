@@ -31,7 +31,7 @@ In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 * Exercise 12.2
 
 ** 1.
-// we have it in last year exercise 7.3. please type it in? :P
+(1). (r \Join)
 
 ** 2.
 For semijoin, the worst case is, there is no reduction after each projection. In other words, in the join column each relation has one corresponding tuple in another relation. So the cost includes the scanning, projection and (n-1) natural join. So the space complexity in this situation is the fixed space requirement, which is for the scanning, projection and the temporal space, plus the variable space requirement, which is r1 + r2 + ... + rn. The complexity is O(n).
