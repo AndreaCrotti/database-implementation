@@ -16,7 +16,9 @@ So we get the total number of possible sequences as 6 * 2 = 12
 
 First situation, we have a sequence as: (), (), (), (2,0,D), (), (). 
 Apply the same method in question 2, we have the permutation: (3! / 2!) * 2! = 6.
+
 Second situation, we have a sequence as : (), (), (2,0,D), (), (), (). Because the coordinator doesn't wait for the response from site 1 any more when it receives "do not commit" from any site. So the order of the last 3 message can be arbitrary. So we get the permutation is 2! * 3! = 12
+
 Third situation, we have a sequence as : (0,2,P), (2,0,D), (0,1,P), (), (), (). We think even if a "do not commit" is received by coordinator before it send other "prepare", it will still send the "prepare". So the order of first 3 messages is fixed in this situation, and the last 3 messages have arbitrary order. Therefore the permutation is 3! = 6.
 
 In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
@@ -24,7 +26,7 @@ In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 ** 4. There is no response from site 2. So we only have 3 messages in the first phase, and 2 messages in the second phase. Since the order of (0,1,P) and (1,0,R) is fixed. So we have the total permutation as (3! / 2!) * 2! = 6.
 
 ** 5. According to the method we use for the calculation of question 2, we can summarize it to be :
-((2n)! / (2!)^n) * (n!)
+((2n)! / 2^n) * (n!)
 
 * Exercise 12.2
 
