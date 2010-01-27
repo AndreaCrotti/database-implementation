@@ -31,7 +31,10 @@ In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 * Exercise 12.2
 
 ** 1.
-(1). (r \Join)
+(1). (r \lJoin s) \Join s = (r \Join \pi_{R\cap S}(s)) \Join s = r \Join (\pi_{R\cap S}(s) \Join s) = r\Join s
+(2). r \lJoin s = def\pi_R (r \Join s) = \pi_R (r \Join pi_S(s)) = \pi_R (r) \Join pi_{R \cap S}(s) = r \Join \pi_{R \cap S}(s)
+(3). r'\Join s' = r' \Join (s \lJoin r') = (s \lJoin r') \Join r' = s \Join r' = s \Join (r \lJoin s) = (r \lJoin s) \Join s = r \Join s
+
 
 ** 2.
 For semijoin, the worst case is, there is no reduction after each projection. In other words, in the join column each relation has one corresponding tuple in another relation. So the cost includes the scanning, projection and (n-1) natural join. So the space complexity in this situation is the fixed space requirement, which is for the scanning, projection and the temporal space, plus the variable space requirement, which is r1 + r2 + ... + rn. The complexity is O(n).
