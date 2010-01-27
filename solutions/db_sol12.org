@@ -8,14 +8,14 @@ EXERCISE 12
 
 ** 2. (0,1,P),(0,2,P),(2,0,R),(1,0,R),(0,2,C),(0,1,C)
 In the first phase, we first calculate the permutation of the first 4 messages, so that we have 4! = 4*3*2*1 = 24.
-Since it is not possible to have response of a site before sending "prepare" to it. So the order of (0,1,P) and (1,0,R) is fixed. The same applies to site 2. So we get the permutation in the first phase as 4! / (2! * 2!) = 6.
+Since it is not possible to have response of a site before sending "prepare" to it. So the order of (0,1,P) and (1,0,R) is fixed. The same applies to site 2. So we get the permutation in the first phase as 4! / (2 * 2) = 6.
 In the second phase we have 2 posible sequenses, which are (0,2,C),(0,1,C) or (0,1,C),(0,2,C).
 So we get the total number of possible sequences as 6 * 2 = 12
 
 ** 3. If site 1 wants to commit and site 2 does not, we calculate the possible sequences number according to the different position of the "do not commit" message.
 
 First situation, we have a sequence as: (), (), (), (2,0,D), (), (). 
-Apply the same method in question 2, we have the permutation: (3! / 2!) * 2! = 6.
+Apply the same method in question 2, we have the permutation: (3! / 2) * 2! = 6.
 
 Second situation, we have a sequence as : (), (), (2,0,D), (), (), (). Because the coordinator doesn't wait for the response from site 1 any more when it receives "do not commit" from any site. So the order of the last 3 message can be arbitrary. So we get the permutation is 2! * 3! = 12
 
@@ -34,6 +34,9 @@ In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 // we have it in last year exercise 7.3. please type it in? :P
 
 ** 2.
+For semijoin, the worst case is, there is no reduction after each projection. In other words, in the join column each relation has one corresponding tuple in another relation. So the cost includes the scanning, projection and (n-1) natural join. So the space complexity in this situation is the fixed space requirement, which is for the scanning, projection and the temporal space, plus the variable space requirement, which is r1 + r2 + ... + rn. The complexity is O(n).
+
+For complexity of  r1  r2 . . .  rn,  in the worst case, the result of  r1  r2 would be at most |r1| * |r2|, that there is no shared attribute.  So in total, the result of natural join of n relations would be at most |r1|*|r2|*...|rn|.  For n step evaluation, the space cost would be proportional to |r1| * |r2| ...*|r(n+1)|.  The complexity is O(2^n). 
 
 ** 3. First we do the projection of r on Y, then ship the projection result to site B.
 Then we do natural join of the projection and relation s, then we get a reduction of s with respect to r.
