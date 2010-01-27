@@ -32,7 +32,9 @@ In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
 
 ** 1.
 (1). (r \lJoin s) \Join s = (r \Join \pi_{R\cap S}(s)) \Join s = r \Join (\pi_{R\cap S}(s) \Join s) = r\Join s
+
 (2). r \lJoin s = def\pi_R (r \Join s) = \pi_R (r \Join pi_S(s)) = \pi_R (r) \Join pi_{R \cap S}(s) = r \Join \pi_{R \cap S}(s)
+
 (3). r'\Join s' = r' \Join (s \lJoin r') = (s \lJoin r') \Join r' = s \Join r' = s \Join (r \lJoin s) = (r \lJoin s) \Join s = r \Join s
 
 
@@ -41,8 +43,10 @@ For semijoin, the worst case is, there is no reduction after each projection. In
 
 For complexity of  r1  r2 . . .  rn,  in the worst case, the result of  r1  r2 would be at most |r1| * |r2|, that there is no shared attribute.  So in total, the result of natural join of n relations would be at most |r1|*|r2|*...|rn|.  For n step evaluation, the space cost would be proportional to |r1| * |r2| ...*|r(n+1)|.  The complexity is O(2^n). 
 
-** 3. First we do the projection of r on Y, then ship the projection result to site B.
-Then we do natural join of the projection and relation s, then we get a reduction of s with respect to r.
-Then we ship the reduction of s to site A, and compute the natural join of the reduction and r.
+** 3. First we do the projection of r on Y, then ship the projection result P to site B.
+Then we do natural join of the projection P and relation s, then we get a reduction of s, which is noted as s', with respect to r.
+Then we ship the reduction s' to site A, and compute the natural join of the reduction and r.
 
-The total transmition is the size of the tuples of the projection on Y in r, plus the size of the reduction of s with respect to r.
+The total transmition size is the tuples of the projection P, plus the size of the reduction s': P + s'.
+
+If in the join column each relation has one corresponding tuple in another relation, then we don't do the projection, just ship the whole relation to A.
