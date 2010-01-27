@@ -7,46 +7,55 @@ EXERCISE 12
 ** 1. (0,1,P), (0,2,P), (2,0,D), (1,0,R), (0,2,A), (0,1,A)
 
 ** 2. (0,1,P),(0,2,P),(2,0,R),(1,0,R),(0,2,C),(0,1,C)
-In the first phase, we first calculate the permutation of the first 4 messages, so that we have 4! = 4*3*2*1 = 24.
-Since it is not possible to have response of a site before sending "prepare" to it. So the order of (0,1,P) and (1,0,R) is fixed. The same applies to site 2. So we get the permutation in the first phase as 4! / (2 * 2) = 6.
-In the second phase we have 2 posible sequenses, which are (0,2,C),(0,1,C) or (0,1,C),(0,2,C).
-So we get the total number of possible sequences as 6 * 2 = 12
+   In the first phase, we first calculate the permutation of the first 4 messages, so that we have 4! = 4*3*2*1 = 24. \\
+   Since it is not possible to have response of a site before sending "prepare" to it. \\
+   So the order of (0,1,P) and (1,0,R) is fixed. The same applies to site 2. So we get the permutation in the first phase as $4! / (2 * 2) = 6$. \\
+   In the second phase we have 2 posible sequenses, which are (0,2,C),(0,1,C) or (0,1,C),(0,2,C).
+   
+   So we get the total number of possible sequences as 6 * 2 = 12
 
 ** 3. If site 1 wants to commit and site 2 does not, we calculate the possible sequences number according to the different position of the "do not commit" message.
 
-First situation, we have a sequence as: (), (), (), (2,0,D), (), (). 
-Apply the same method in question 2, we have the permutation: (3! / 2) * 2! = 6.
+   First situation, we have a sequence as: (), (), (), (2,0,D), (), (). 
+   Apply the same method in question 2, we have the permutation: $(3! / 2) * 2! = 6$. \\
 
-Second situation, we have a sequence as : (), (), (2,0,D), (), (), (). Because the coordinator doesn't wait for the response from site 1 any more when it receives "do not commit" from any site. So the order of the last 3 message can be arbitrary. So we get the permutation is 2! * 3! = 12
+   Second situation, we have a sequence as : (), (), (2,0,D), (), (), (). \\
+   Because the coordinator doesn't wait for the response from site 1 any more when it receives "do not commit" from any site. 
+   So the order of the last 3 message can be arbitrary. So we get the permutation is 2! * 3! = 12
 
-Third situation, we have a sequence as : (0,2,P), (2,0,D), (0,1,P), (), (), (). We think even if a "do not commit" is received by coordinator before it send other "prepare", it will still send the "prepare". So the order of first 3 messages is fixed in this situation, and the last 3 messages have arbitrary order. Therefore the permutation is 3! = 6.
+   Third situation, we have a sequence as : (0,2,P), (2,0,D), (0,1,P), (), (), ().  \\
+   We think even if a "do not commit" is received by coordinator before it send other "prepare", it will still send the "prepare". 
+   So the order of first 3 messages is fixed in this situation, and the last 3 messages have arbitrary order. Therefore the permutation is 3! = 6.
 
-In a sum, we have the possible sequences number = 6 + 12 + 6 = 24.
+   In a sum, we have the possible sequences number = $6 + 12 + 6 = 24$.
 
-** 4. There is no response from site 2. So we only have 3 messages in the first phase, and 2 messages in the second phase. Since the order of (0,1,P) and (1,0,R) is fixed. So we have the total permutation as (3! / 2!) * 2! = 6.
+** 4. 
+   There is no response from site 2. So we only have 3 messages in the first phase, and 2 messages in the second phase. 
+   Since the order of (0,1,P) and (1,0,R) is fixed. So we have the total permutation as $(3! / 2!) * 2! = 6$.
 
 ** 5. According to the method we use for the calculation of question 2, we can summarize it to be :
-((2n)! / 2^n) * (n!)
+   $((2n)! / 2^n) * (n!)$
 
 * Exercise 12.2
 
 ** 1.
-(1). (r \lJoin s) \Join s = (r \Join \pi_{R\cap S}(s)) \Join s = r \Join (\pi_{R\cap S}(s) \Join s) = r\Join s
+   - (1). $(r \lJoin s) \Join s = (r \Join \pi_{R\cap S}(s)) \Join s = r \Join (\pi_{R\cap S}(s) \Join s) = r\Join s$
 
-(2). r \lJoin s = def\pi_R (r \Join s) = \pi_R (r \Join pi_S(s)) = \pi_R (r) \Join pi_{R \cap S}(s) = r \Join \pi_{R \cap S}(s)
-
-(3). r'\Join s' = r' \Join (s \lJoin r') = (s \lJoin r') \Join r' = s \Join r' = s \Join (r \lJoin s) = (r \lJoin s) \Join s = r \Join s
+   - (2). $r \lJoin s = def\pi_R (r \Join s) = \pi_R (r \Join pi_S(s)) = \pi_R (r) \Join pi_{R \cap S}(s) = r \Join \pi_{R \cap S}(s)$
+   
+   - (3). $r'\Join s' = r' \Join (s \lJoin r') = (s \lJoin r') \Join r' = s \Join r' = s \Join (r \lJoin s) = (r \lJoin s) \Join s = r \Join s$
 
 
 ** 2.
-For semijoin, the worst case is, there is no reduction after each projection. In other words, in the join column each relation has one corresponding tuple in another relation. So the cost includes the scanning, projection and (n-1) natural join. So the space complexity in this situation is the fixed space requirement, which is for the scanning, projection and the temporal space, plus the variable space requirement, which is r1 + r2 + ... + rn. The complexity is O(n).
+   For semijoin, the worst case is, there is no reduction after each projection. In other words, in the join column each relation has one corresponding tuple in another relation. So the cost includes the scanning, projection and (n-1) natural join. So the space complexity in this situation is the fixed space requirement, which is for the scanning, projection and the temporal space, plus the variable space requirement, which is r1 + r2 + ... + rn. The complexity is O(n).
 
-For complexity of  r1  r2 . . .  rn,  in the worst case, the result of  r1  r2 would be at most |r1| * |r2|, that there is no shared attribute.  So in total, the result of natural join of n relations would be at most |r1|*|r2|*...|rn|.  For n step evaluation, the space cost would be proportional to |r1| * |r2| ...*|r(n+1)|.  The complexity is O(2^n). 
+   For complexity of  r1  r2 . . .  rn,  in the worst case, the result of  r1  r2 would be at most |r1| * |r2|, that there is no shared attribute.  So in total, the result of natural join of n relations would be at most |r1|*|r2|*...|rn|.  For n step evaluation, the space cost would be proportional to |r1| * |r2| ...*|r(n+1)|.  The complexity is O(2^n). 
 
-** 3. First we do the projection of r on Y, then ship the projection result P to site B.
-Then we do natural join of the projection P and relation s, then we get a reduction of s, which is noted as s', with respect to r.
-Then we ship the reduction s' to site A, and compute the natural join of the reduction and r.
+** 3.
+   First we do the projection of r on Y, then ship the projection result P to site B.
+   Then we do natural join of the projection P and relation s, then we get a reduction of s, which is noted as s', with respect to r.
+   Then we ship the reduction s' to site A, and compute the natural join of the reduction and r.
 
-The total transmition size is the tuples of the projection P, plus the size of the reduction s': P + s'.
+   The total transmition size is the tuples of the projection P, plus the size of the reduction s': P + s'.
 
-If in the join column each relation has one corresponding tuple in another relation, then we don't do the projection, just ship the whole relation to A.
+   If in the join column each relation has one corresponding tuple in another relation, then we don't do the projection, just ship the whole relation to A.
