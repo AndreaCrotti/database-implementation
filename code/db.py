@@ -54,16 +54,6 @@ class Schedule(object):
         """ Computes the read from relations between transactions"""
         pass
 
-    @staticmethod
-    def herbrand(index):
-        """
-        Get the herbrand semantics of the schedule,
-        better in a recursive way
-        H_s(ri(x)) = H_s(wj(x)) and wj(x) is the last write action before ri(x)
-        We must keep track of all writings, not just final value obtained
-        """
-        pass
-    
     # Implement some possible schedulers which are CORRECT
 
 

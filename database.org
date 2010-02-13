@@ -1,70 +1,151 @@
-* Serializability
-** Semantics of a schedule
-   Is computed using the Herbrand semantics.
+#+OPTIONS: toc:nil num:nil
+* Exam study
+  - see exercises an theory about [[file:references/Aries.pdf][ARIES]].
+  - understand how to to the query graphs (from older assignments)
+  - check if DPNF could be asked
 
-** Final State Serializability
-   Let $s$ and $s'$ be schedules, they are called *finite-state equivalent* if
-   $op(s) = op(s')$ and $H[s] = H[s']$ are valid.
-   Therefore $s \equiv s'$
+* Transactions
+  Transactions can be simplified with the *read/write* model, we could have for example those synchronization problems:
+  - Lost update: \\
+    writing after writing interleaving actions.
+    For example T1 reads, T2 updates and T1 writes again, the update done by T2 is then lost.
+  - Dirty read: \\
+    reading a value given by an aborted transaction
+  - Non repeatable/inconsistent read: \\
+    one process read from a variable after other processes have worked on it
+  - Phantom problem: \\
+    solved only with index locking or an higher locking mechanism
 
-   We can't determine it by simply the last state but also by previous write operations.
-   
-   *Read from* relation is given when $p \rightarrow q$, so the action p is read in q.
-   An action p is /directly useful/ ($p \rightarrow q$) if q is read from p or p is read and q consecutive write action.
-   
-   Action is *alive* if it's useful for some other actions in the future.
-   
-   *Live-reads-from* relation 
+  Thus we need a recovery control and a smart scheduler that satisfies the ACID principles.
+  Serializability and recoverability are two different ways to classify our schedules.
 
-   FSR is the class of all /finite-state-serializable/ schedules.
-   But the test for inclusion in FSR has *exponential complexity*.
+** ACID
+   Every transaction must be processed in a way that those principles are satisfied.
+   - Atomicity
+   - Consistency
+   - Isolation
+   - Durability
 
-*** TODO Try to implement the Herbrand semantic
-   
-** Conflicts
-   Two operators are in *conflict* if they operate on the same object and at least one is a write.
-   
-   $s$ and $s'$ are *conflict equivalent* if
-   - $op(s) = op(s')$
-   - $conf(s) = conf(s')$
-   
-   /Conflict serializable/ if a serial schedule exists with equivalent serializability.
+** Read/Write model
+   A transaction is a finite set of read write operations on objects x, where x is a database object. \\
+   D = {x,y,z} \\
+   t1 = r1(x), r1(y), w1(z)..
 
+   A shuffle is one of the possible permutations of the execution order (also called *complete schedule*).
 
-*** Serializability theorem:
-   It holds
-   $CSR \subset VSR \subset FSR$
-   We can then build a simple conflict graph and say that.
-   $s \in CSR \leftrightarrow G(s)$ is acyclic
-   
-   So we can check in polynomial time the conflict serializability.
+** Serializability
+*** Semantics of a schedule
+    For every schedule we can compute its semantic (the meaning), in short.
+    - H_s(ri(x)) = semantic of the last write
+    - H_s(wi(x)) is a function taking all the previous reads as arguments.
+    
+    The schedule is then a mapping in the form \\
+    $H\[s\] : D \rightarrow HI$
+    Where HU is the Herbrand universe.
+    
+*** Final State Serializability
+    Let $s$ and $s'$ be schedules, they are called *finite-state equivalent* if
+    $op(s) = op(s')$ and $H[s] = H[s']$ are valid.
+    Therefore $s \equiv s'$
 
-*** Order preserving conflict serializability
-    We can impose constraints on CSR imposing that some actions must be executed later.
-    An /ordering/ of the conflict order is sufficient for /conflict serializability/.
-		    
+    We can't determine it by simply the last state but also by previous write operations, also the previous write operations must be taken into account.
+    
+    *Read from* relation is given when $p \rightarrow q$, so the action p is read in q.
+    An action p is /directly useful/ ($p \rightarrow q$) if q is read from p or p is read and q consecutive write action.
+    
+    Action is *alive* if it's useful for some other actions in the future.
+    
+    *Live-reads-from* relation is done by all the tuples (t_x, <var>, t_y) which are in a read from relation. \\
+    Reads before writing are in relations with *t_0* and write before the end are in relation with *t_\infty*.
 
+    FSR is the class of all /finite-state-serializable/ schedules.
+    But the test for inclusion in FSR has *exponential complexity*, so is not well suitable for analysis.
 
+*** VSR
+    A serial schedule is schedulable if it is equivalent to serializable schedule such that. \\
+    RF(s') = RF(s3), op(s') = op(s3) are holding.
+
+*** Conflicts
+    Two actions are in *conflict* if they operate on the same object and at least one is a write. \\
+    - r1(x) w1(x) \rightarrow conflict
+    - w1(x) w2(x) \rightarrow conflict
+    
+    $s$ and $s'$ are *conflict equivalent* if
+    - $op(s) = op(s')$
+    - $conf(s) = conf(s')$
+      
+    They are /conflict-equivalent/ if they can be turned one into the other by a sequence of nonconflicting swaps of adjacent actions.
+
+    A schedule is /conflict serializable/ if it is conflict-equivalent to a serializable schedule (swapping all the actions should lead to a serializable schedule).
+    Testing for membership to CSR can be done in polynomial time.
+
+    For conflict and view serializability checking just take into account the transactions that actually commmits and *sort out* the aborted.
+    
+**** Precedence graphs
+     T1 <_s T2 if there are actions A_1 of T_1 and A_2 of T_2 such that:
+     - A_1 is ahead of A_2 in S
+     - A_1 and A_2 involve the same element
+     - At least one is a write action
+
+     With those information we can write a graph and
+     graph is /cyclic/ \rightarrow the schedule is not conflict serializable.
+     
+**** Serializability theorem:
+    It holds
+    $CSR \subset VSR \subset FSR$
+    We can then build a simple conflict graph and say that.
+    $s \in CSR \leftrightarrow G(s)$ is acyclic
+    
+    So we can check in polynomial time the conflict serializability.
+
+**** Order preserving conflict serializability
+     We can impose constraints on CSR imposing that some actions must be executed later.
+     An /ordering/ of the conflict order is sufficient for /conflict serializability/.
+     
 * Transaction recovery
   Serializability does not avoid synchronization problems between processes.
   Recovery properties are orthogonal to serializability.
 
-  Under which conditions a schedule allows a *correct recovery of transactions*?
+  Under which conditions a schedule allows a *correct recovery of transactions*? \\
+  We need to be able to make sure we can go back to the starting point from an aborted transaction (for example).
+  
+  In order of strictness we have \\
+  $REC \subset ACA \subset STRICT \subset RIGOROUS$
+  Strict schedules solve WW and WR conflicts, while Rigorous schedules also solve the RW conflict (less dangerous).
 
 ** Recoverability
-  Every transaction will not be released, until all the other transactions from which it has read, are released
-  RC is the class of all recoverable schedules.
-  
-  In other words we can say that if we read from another transaction we must make sure that the other transction does the commit before us.
+   Every transaction will not be released, until all the other transactions from which it has read, are released
+   RC is the class of all recoverable schedules.
+   
+   In other words we can say that if we read from another transaction we must make sure that the other transction does the commit before us.
+   For example.
+   - $s1 = w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) c2 w1(z) c1 \notin RC$
+   - $s2 = w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) w1(z) c1 c2 \in RC$
 
+   Because t2 reads from t1 on y and c2 commits before c1.
+   
 ** Avoidance of cascading aborts
+   Recoverability does not suffice in some situations, because the values restored after an abort, may be different from the before image. \\
+   So we need to rollback aborted transactions *and* redo committed transactions.
    A transaction is only allowed to read values from already successfully completed transactions.
 
+   - $s2=w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) w1(z) c1 c2 \notin ACA$
+   - $s3=w1(x) w1(y) r2(u) w2(x) w1(z) c1 r2(y) w2(y) c2 \in ACA$
+
+   Here t2 tries to read y before t1 (who wrote on it) has committed.
+   
 ** Strictness
-   A schedule is strict, if an object is not read or overwritten, until the transction, which has written it at last, is terminated.
+   A schedule is strict, if an object is not read or overwritten, until the transaction, which has written it at last, is terminated.
+   Not able to mix different transactions in this way.
+   
+   - $s3 =w1(x) w1(y) r2(u) w2(x) w1(z) c1 r2(y) w2(y) c2 \notin ST$
+   - $s4 =w1(x) w1(y) r2(u) w1(z) c1 w2(x) r2(y) w2(y) c2 \in ST$
+   Here t2 was trying to write on x before t1 (who wrote x for last) terminated.
+   Another way to check is checking that after every write operation the corresponding transaction is terminated.
 
 ** Rigorous schedules
    A schedule is rigorous, if it is strict and no object x is overwritten, until all transactions, which have read x at last, are terminated
+   
 
 * Concurrency Control Protocols
   Techiques thanks to which the DBMS can generate correct schedules.
@@ -74,7 +155,6 @@
   - Safety
   - expressiveness
   
-  
 ** Locking scheduler
    Applied for synchronization of accesses on same data objects.
    For a schedule s a DT(s) it the projection of s on the actions of type "a,c,r,w".
@@ -83,31 +163,243 @@
    
    - rl(x) read lock
    - wl(x) write lock
+
+   In genernal unlocks don't have to be done immediately after but they must be not redundant.
+   Now some possible implementations of locking protocols.
      
 *** Two phase locking (2PL)
     A locking protocol is /two phase/ if:
     After the first unlocking operation, locking can't be set anymore.
     In the first phase of the transaction locks will only be set, in the second phase will only be removed.
+    The cycle of locking/unlocking is restarted after every commit operation.
     
     - easy to implement
     - good performances
     - easy to distribute
     - *not* deadlock free
     - transactions may starve!
-    
-*** MGL
-    We need *intentional locks*.
-    The idea is for a transaction to indicate, along the path, what locks will require in some of the possible paths.
-    - irl:
-      a read lock will be requested
-    - iwl:
-      a write lock will be requested
-    - riwl:
-      current node is read locked but also a write lock will be requested later.
+      
+    $\epsilon(2PL) \subseteq CSR$
 
+    Other possible variants are:
+    - Conservative 2PL:
+      All locks available since BOT
+    - S2PL:
+      All write locks hold till EOT (removing locks just after the transaction is concluded)
+    - SS2PL:
+      All locks hold till EOT (too restrictive, transactions should be too short in this case)
+
+    Removing a lock is always safer at the end of the transaction, but usually much earlier.
+
+    $\epsilon(S2PL) \subseteq CSR \bigcap ST$, the S2PL scheduler is safe.
+
+    *Trick*: \\
+    Once you have set up a write lock you can also read directly.
+    
+**** Disadvantages
+     - big locking objects \rightarrow a few locks but with many conflicts
+     - small locking objects \rightarrow more concurrency but a higher cost
+     
+     That's why there are also other ways to manage the locking
+
+
+**** Solving
+     Given a schedule if you're not able find a schedule because the locks are interfering you can *abort* and restart.
+     This will make it able to commit other transactions that are interfering.
+
+*** MGL
+     We need *intentional locks*.
+     The idea is for a transaction to indicate, along the path, what locks will require in some of the possible paths.
+     - irl:
+       a read lock will be requested
+     - iwl:
+       a write lock will be requested
+     - riwl:
+       current node is read locked but also a write lock will be requested later in the subtree.
+
+     Considering the structure of the database: \\
+     db \rightarrow Areas \rightarrow files \rightarrow Relations
+     We can set up locks with a higher granularity on one particular subtree.
+     
+     Read lock is also called /shared/ lock, while write lock is /exclusive/.
+     To be able to apply locks on one tree we must first have acquired an /intentional lock/.
+     And you can't remove an intentional lock until you have a lock on one child node, the locks are set top-down and removed bottom-up.
+
+     A transaction can only hold *one* lock on an object, this are the possible updates
+#+begin_src dot :file ilocks.pdf :cmdline -Tpdf :exports none :results silent
+     digraph G {
+     irl -> iwl;
+     irl -> rl;
+     iwl -> riwl;
+     rl -> riwl;
+     riwl -> wl;
+}
+#+end_src
+     
+     [[file:ilocks.pdf]]
+
+**** Example
+     Read records Page 1200:5
+     - irl(D)
+     - irl(F2)
+     - irl(P1200)
+     - rl(P1200:5)
+
+*** Index locking
+    Assuming insertions also S2PL could fail (phantom problem for example).
+    Conflict serializability is only guaranteed as long as we don't add objects.
+    - no index (disable completely insertions)
+    - index on fields which are used in those transactions (which normally at run time is not known anyway)
+
+*** Predicate locking
+    Only lock on all records satisfying some logical predicates (not commonly used as it's too much expansive to implement).
+
+*** Locking in B+Trees
+    In B+Trees real data is only contained in the leaf nodes, no information given by the intermediates.
+    - Searching
+      + go down from root
+      + read lock child, unlock parent
+    - Insert / delete
+      + go down from root
+      + write lock child, then check if safe
+        A node is safe if changes will not propagate to higher levels of the tree
+        - insertions: Node is not full
+        - deletinons: Node is not half empty
+
+    The problem is that there are two many useless write locks, since the data is only phisically stored in the leaves.
+    When locking for a search keep in mind that in the algorithm there is no use of the key value, so we need to lock the subtrees (and also to prevent phantom problems).
+    
+    *Improved tree locking*:
+    Try to lock only the leaf, if not safe backtrack to root and use previous algorithm.
+    
+    Another possible way could be to use MGL, but deadlocks are possible.
+
+*** Non locking
+    Other possible ways without locking are possible
+    - Optimistic CC
+      Use private copies and if there is a conflict abort and restart
+    - Timestamp based CC
+      Every TA gets a timestamp, if p_i and q_i are in conflict execute p_i before q_i, so it generates conflict serializable schedules.
+      It's not more efficient but can be used in distributed systems.
+
+
+** Concurrency control in SQL
+   SQL allows to set up different security levels, for different usages:
+   - READ UNCOMMITTED
+   - READ COMMITTED
+   - REPEATABLE READ
+   - SERIALIZABLE
+
+   In order of safety and decreasing concurrency allowed.
+
+* Recovery protocols
+  We need to be able to recover from transactions faults.
+  - REDO if transaction was done but not stored
+  - UNDO if transaction was partially written before the fault
+
+  A recovery manager get's the transactions from the scheduler and take some precautions before actually loading them.
+
+  Write a new value of x:
+  - store a /Before-image/ of x ({ID, x, oldx})
+  - store an /After-image/ of x ({ID, x, newx})
+
+  We could also avoid UNDO and REDO if we put some constraints on the execution of read/write in the system.
+  - UNDO-rule: (write-ahead log protocol)
+    before image of a write operation must be written to the log *before* the new value appear stable in the database
+  - REDO-rule: (commit-rule)
+    before a transaction is terminated, every new value written by must be in the stable storage.
+
+** Steal and force
+   - Steal:
+     Replace the frame in memory which contains the page with the object o (the frame is stolen).
+     
+   - Force:
+     When the transaction commit, we ensure that all the changes to the object are immediately *forced* to disk.
+   
+   Best combination is *Steal + no force*.
+
+* ARIES
+  Steal-no force approach used.
+  - Write-ahead-logging
+  - repeat history during redo
+    repeat ALL actions before the crash
+  - logging changes during undo
+    write in the *CLRs* changes made during undoing.
+
+** WAL
+   - force log record update *before* corresponding data gets written to disk
+   - write all records for a transaction *before commit*
+
+** LOG
+   The log must contain every information useful for reconstructing the correct values.
+   In particular
+   - LSN (log sequence number, for every log record)
+   - old data
+   - new data
+   ...
+   In plus we must keep a
+   - *transaction table* (one entry for each active transaction and a lastLSN)
+   - *dirty page table*  (one entry per dirty page in buffer and a reclLSN, the log record who first caused the problem)
+     
+   Redo is done from the reclLSN and undo until lastLSN.
+
+** Checkpointing
+   Periodically a *checkpoint* is created by the DBMS to minimize the time needed to recover. \\
+   Store also the LSN of the checkpoint on disk.
+   You must clear the dirty page table before doing it, and then the analysis phase can start from the last checkpoint created.
+
+** Recovery
+   A nice thing about ARIES is that it works even if we have a failure during a recovery.
+*** Analysis
+    - Reconstruct state at checkpoint (using the record)
+    - Scan log forward from checkpoint
+      + End record: remove transaction from transaction table
+      + Other records: Add transaction to transaction table, set lastLSN=LSN, change status to commit
+      + Update record: if P not in DPT, add P to DPT, set reclLSN=LSN.
+
+    This phase is used to determine:
+    - point where to start the REDO pass (reclLSN)
+    - the /dirty pages/ at moment of crash
+    - /transactions active/ at the moment of crash
+
+*** REDO phase
+    - repeat history to reconstruct state at crash (reapply all updates)
+    - reapply logged actions
+
+    Redo redoes all changes to any page that was dirty at the moment of crash
+
+*** UNDO phase
+    Undoes all the transactions that were active (but didn't commit) at the moment of crash.
+    
+
+* b+Trees
+  The /order/ of a B+Tree is defined as capacity of the nodes (number of children nodes) in the tree.
+  For example a b+tree of order 2 can have a max of 2 values for every node which mean 3 subpointers. \\
+  A particular tree structure where the data is only storead in the leaves.
+  Particulary well suited for search, there also is a link between the leaves.
+
+  For example given a possible given a key node of order 2 [A | B] it can have 3 children where:
+  - [x < A]
+  - [A <= x < B]
+  - [x >= B]
   
-** Clustered relation
-   A relation is /clustered/ if its tuples are packed into roughly as few blocks as possibly hold those tuples.
+** Insertion
+   - do a search to determine what bucket the new record should go in
+   - if the bucket is not full, add the record.
+   - otherwise, split the bucket.
+   - allocate new leaf and move half the bucket's elements to the new bucket
+   - insert the new leaf's smallest key and address into the parent.
+   - if the parent is full, split it also
+   - now add the middle key to the parent node
+   - repeat until a parent is found that need not split
+   - if the root splits, create a new root which has one key and two pointers.
+
+** Characteristics
+   Given a B+Tree of order /b/ and height /h/
+   - max number of records stored: n = b^h (only the leaves count)
+   - space required to store the tree: $O(n)$
+   - inserting a record: $O(\log_b{n})$
+   - performing a range query with k elements: $O(log_b{n} + k)$
 
 * Indexing
   Indexes are used to speed up the retrieval of records in response to certain search conditions.
@@ -132,7 +424,113 @@
 
 *** Multilevel indexes using B-Trees and B^{+}-Trees
     
+
 * Query evaluation
+  In genernal a select would be translated to an innested loop, possible ways to improve:
+  - selection before join (makes the tables to join smaller)
+  - semi joins
+  - index, hashing
+  - sequence optimization (change the order of operations)
+
+  Other possible ways are:
+  - sort/merge algorithm
+  - note/join
+  - hash join
+
+** Query optimization
+   Use the /tableau/ method to remove useless lines of the tableau.
+
+** Access planning
+   The access plan is important to get the maximum possible speed.
+   - Join sequence
+   - Join implementation
+   - Parallelism
+   - Distribution
+
+   Dynamic programming techniques are used to find the best tradeoff.
+   Cost estimation is important in finding the right access planning.
+   - intermediate result sizes
+   - phisical access dependencies
+
+** Query representation
+   - Tuple relational calculus
+   - Relational algebra
+   - Domain calculus
+   - DPNF
+
+*** Tuple relational calculus
+    A query is in the form:
+    {<goal list> OF EACH r_1..., EACH r_n in R_n: /selection predicate/}
+    We can have different possibilities for selecting, from normal boolean conditions to join on other lists for some attributes.
+    /SOME/ and /ALL/ are the quantifiers used for testing.
+
+*** Relational algebra
+    We define other operators
+    - Projection \pi
+    - Selection \sigma
+    - Join \Join
+    - Union \bigcup
+    - Intersection \bigcap
+    - Difference -
+
+    For example, names of the dependents with one son and salary > 10000
+    $\pi_{name}((\sigma_{sons = 1} SONS) \Join (\sigma_{salary > 10000} DEPS))$
+    
+    Moreover we have defined:
+    - cartesian product (R \times S)
+    - natural join (equal in their common attribute name)
+    - semi-join (there is A couple in S with the equal attribute)
+    - \theta-join, equi-join (join with a condition of = or <> on one attribute)
+
+*** Domain relational calculus
+    Domain variables x_i \in Dom represents attributes.
+    Predicates:
+    - Atomic predicates
+    - \not A ..
+    - \forall x_i A
+    - \exists x_i A
+
+    Facts:
+    Atomic predicates with possible universal quantified variables
+    Rules:
+    Disjunctive Horn clauses.
+    
+    There is a close relation with Domain calculus and tableau representation.
+    A tableaux can be optimized finding the minimal outcome of all equivalent tableaux.
+
+    T_1 \subseteq T_2 if
+    1. T_1, T_2 have the same columns and entries in result rows
+    2. The relation computed from T_1 is a subset of the one from T_2 for all assignments of relations to rows.
+       
+    We just need to find a function mapping from one to the other.
+
+    *Minimization*:
+    Delete every row and check equivalence with the original tableau. (NP-complete procedure)
+
+** Implementation of relational operators
+   Relational operators are implemented to be as fast as possible using buffers and other available structures given by the DBMS.
+   
+*** Sorting
+    - Normally data are requested in order
+    - Sorting is useful for building B+tree index
+    - Useful to eliminate duplicates
+
+    The problem is sorting X Mb of data in Y Mb of ram (X >> Y)
+
+    *2 way sorting*:
+    - Pass 1: reads a page, sort it, write it (only 1 buffer needed)
+    - Pass 2,3...: three buffer pages are used
+
+    It's a /divide et impera/ algorithm, we sort the smaller parts and then merge them together while we go on.
+    2 buffers for reading the sorted data and writing them in the third buffer.
+
+    In general a *n-way sorting* can use more buffers and produce directly more.
+
+    Number of passes needed for /N/ records and /B/ buffers needed can be computed as:
+    $\#pass = \lceil\log_B N\rceil$
+
+    Using B+trees for sorting is a good idea only if they are clustered.
+
 ** Join ordering
    "Database the complete book" contains many informations about it.
    Otherwise there's a paper on l2p about it.
@@ -178,3 +576,8 @@
      efficient selection (unification) but possibly not terminating
    - Forward/generation/bottom up (databases):
      Finite sequence of algebraic manipulations, but possibly large unnecessary results
+
+* Some remarks
+  - natural join \Join take the pair that agree in whatever attribute of the schema.
+  - \theta Join force us to set a condition, $R \Join_C R$
+  - /functional dependencies/ (pag 67) 
