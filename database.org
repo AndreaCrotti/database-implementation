@@ -3,6 +3,24 @@
   - see exercises an theory about [[file:references/Aries.pdf][ARIES]].
   - understand how to to the query graphs (from older assignments)
   - check if DPNF could be asked
+  - see what a B+tree clustered mean
+  - do correctly computations on cost and I/O operations needed
+  - understand hash join and try out some complicated examples of cost computations
+  - understand Herbrand models and proofs ([[file:solutions/db_sol11.pdf][sol11]])
+  - review calculations about costs of operations in [[file:exercises/solutions/Solution%20Exercise6_WS0910.ppt][solution6]]
+  - see how hash join works
+  - from tableaux to domain calculus and vice-versa
+
+* Possible questions
+  - B+Trees, operations and advantages
+  - synchronization problems in transactions (make a list, describe)
+  - serializability, definitions and analysis of transactions
+  - failure safety, RC ACA ST and RG
+  - locking protocols (2PL, S2PL and so on)
+  - query optimization, implementation of operators and different query representations
+  - tableaux
+  - datalog (fix point...)
+  - distributed database, 2-phase commit, semijoin
 
 * Transactions
   Transactions can be simplified with the *read/write* model, we could have for example those synchronization problems:
@@ -36,11 +54,11 @@
 ** Serializability
 *** Semantics of a schedule
     For every schedule we can compute its semantic (the meaning), in short.
-    - H_s(ri(x)) = semantic of the last write
-    - H_s(wi(x)) is a function taking all the previous reads as arguments.
+    - H_s(ri(x)): semantic of the last write
+    - H_s(wi(x)): semantic given by a function applied on all the previous reads in the transaction on that argument.
     
     The schedule is then a mapping in the form \\
-    $H\[s\] : D \rightarrow HI$
+    $H[s] : D \rightarrow HI$
     Where HU is the Herbrand universe.
     
 *** Final State Serializability
@@ -56,7 +74,7 @@
     Action is *alive* if it's useful for some other actions in the future.
     
     *Live-reads-from* relation is done by all the tuples (t_x, <var>, t_y) which are in a read from relation. \\
-    Reads before writing are in relations with *t_0* and write before the end are in relation with *t_\infty*.
+    Reads before writing are in relations with *t_0* and write before the end are in relation with $t_\infty$.
 
     FSR is the class of all /finite-state-serializable/ schedules.
     But the test for inclusion in FSR has *exponential complexity*, so is not well suitable for analysis.
@@ -67,8 +85,8 @@
 
 *** Conflicts
     Two actions are in *conflict* if they operate on the same object and at least one is a write. \\
-    - r1(x) w1(x) \rightarrow conflict
-    - w1(x) w2(x) \rightarrow conflict
+    - $r1(x) w1(x) \rightarrow$ conflict
+    - $w1(x) w2(x) \rightarrow$ conflict
     
     $s$ and $s'$ are *conflict equivalent* if
     - $op(s) = op(s')$
@@ -82,13 +100,13 @@
     For conflict and view serializability checking just take into account the transactions that actually commmits and *sort out* the aborted.
     
 **** Precedence graphs
-     T1 <_s T2 if there are actions A_1 of T_1 and A_2 of T_2 such that:
+     $T1 <_s T2$ if there are actions A_1 of T_1 and A_2 of T_2 such that:
      - A_1 is ahead of A_2 in S
      - A_1 and A_2 involve the same element
      - At least one is a write action
 
      With those information we can write a graph and
-     graph is /cyclic/ \rightarrow the schedule is not conflict serializable.
+     graph is cyclic -> the schedule is not conflict serializable.
      
 **** Serializability theorem:
     It holds
@@ -197,8 +215,8 @@
     Once you have set up a write lock you can also read directly.
     
 **** Disadvantages
-     - big locking objects \rightarrow a few locks but with many conflicts
-     - small locking objects \rightarrow more concurrency but a higher cost
+     - big locking objects:  a few locks but with many conflicts
+     - small locking objects: more concurrency but a higher cost
      
      That's why there are also other ways to manage the locking
 
@@ -218,7 +236,7 @@
        current node is read locked but also a write lock will be requested later in the subtree.
 
      Considering the structure of the database: \\
-     db \rightarrow Areas \rightarrow files \rightarrow Relations
+     $db \rightarrow Areas \rightarrow files \rightarrow Relations$
      We can set up locks with a higher granularity on one particular subtree.
      
      Read lock is also called /shared/ lock, while write lock is /exclusive/.
@@ -318,13 +336,24 @@
    
    Best combination is *Steal + no force*.
 
-* ARIES
+* ARIES (/Algorithm for Recovery and Isolation Exploting Semantics/)
+
   Steal-no force approach used.
   - Write-ahead-logging
   - repeat history during redo
     repeat ALL actions before the crash
   - logging changes during undo
     write in the *CLRs* changes made during undoing.
+
+  Goals of ARIES are:
+  - Simplicity
+  - Operation logging
+  - Flexible storage management
+  - Partial rollbacks
+  - Recovery independence
+  - Logical undo
+  - Parallelism and fast recovery
+  - Minimal overhead
 
 ** WAL
    - force log record update *before* corresponding data gets written to disk
@@ -437,8 +466,23 @@
   - note/join
   - hash join
 
-** Query optimization
-   Use the /tableau/ method to remove useless lines of the tableau.
+** Parameters
+   A pass in query evaluation is a read of the data to be processed.
+   To evaluate how many passes are needed we have to consider:
+   - buffer size
+   - various indexes available
+   - data distribution
+  
+   Some operators can be done on the fly and the performances highly depend by the order of execution and the indexing 
+
+*** One pass
+    - Selection always in one pass
+    - Projection only if buffer is big enough (in memory sorting and duplicates elimination)
+    - Join (if smaller relation fits in buffer then nested loop)
+
+*** Two passes
+    Two pass are usually enough for anything, partitioning into acceptable size, sort and hash.
+
 
 ** Access planning
    The access plan is important to get the maximum possible speed.
@@ -451,6 +495,22 @@
    Cost estimation is important in finding the right access planning.
    - intermediate result sizes
    - phisical access dependencies
+
+** Cost estimation
+   We need to compute the selectivity of an operator
+   - *monadic* operators:
+     divide output size by input size
+   - *dyadic* operators:
+     divide output size by product of the inputs
+
+   $V(R,y)$ represents the number of different values for attribute /y/ in the relation /R/.
+   - equality:
+     $F = \frac{1}{V(R,y)}$
+   - range selection:
+     $F = \frac{min(R,y)}{max(R,y) - min(R,y)}$
+     where max and min are the maximum and minimum values
+   - join (on 2 relations):
+     $1 / max(V(S,y), V(R,y))$
 
 ** Query representation
    - Tuple relational calculus
@@ -465,13 +525,15 @@
     /SOME/ and /ALL/ are the quantifiers used for testing.
 
 *** Relational algebra
+    A /relational complete/ language is able to express all queries expressible by RA.
+
     We define other operators
-    - Projection \pi
-    - Selection \sigma
-    - Join \Join
-    - Union \bigcup
-    - Intersection \bigcap
-    - Difference -
+    - Projection
+    - Selection
+    - Join
+    - Union
+    - Intersection
+    - Difference
 
     For example, names of the dependents with one son and salary > 10000
     $\pi_{name}((\sigma_{sons = 1} SONS) \Join (\sigma_{salary > 10000} DEPS))$
@@ -483,12 +545,12 @@
     - \theta-join, equi-join (join with a condition of = or <> on one attribute)
 
 *** Domain relational calculus
-    Domain variables x_i \in Dom represents attributes.
+    Domain variables $x_i \in Dom$ represents attributes.
     Predicates:
     - Atomic predicates
-    - \not A ..
-    - \forall x_i A
-    - \exists x_i A
+    - $\not A$ ..
+    - $\forall x_i A$
+    - $\exists x_i A$
 
     Facts:
     Atomic predicates with possible universal quantified variables
@@ -498,7 +560,7 @@
     There is a close relation with Domain calculus and tableau representation.
     A tableaux can be optimized finding the minimal outcome of all equivalent tableaux.
 
-    T_1 \subseteq T_2 if
+    $T_1 \subseteq T_2$ if
     1. T_1, T_2 have the same columns and entries in result rows
     2. The relation computed from T_1 is a subset of the one from T_2 for all assignments of relations to rows.
        
@@ -528,25 +590,132 @@
 
     Number of passes needed for /N/ records and /B/ buffers needed can be computed as:
     $\#pass = \lceil\log_B N\rceil$
-
     Using B+trees for sorting is a good idea only if they are clustered.
 
-** Join ordering
-   "Database the complete book" contains many informations about it.
-   Otherwise there's a paper on l2p about it.
-   In join we should use the smaller relation as outer relation.
+*** Computing costs 
+    I/O cost for fetching 1 page.
+    /M/ denotes the number of pages
+    No other costs are considered.
 
-** Possible heuristics
-   1. size of intermediate relations
-   2. selections should be pushed down in the tree (even if in some cases it's not better)
-   3. most restrictive joins first
-   4. postpone joining of large relations
+*** Selection
+    Cost of selection can be seen as
+    *No index, unsorted*:
+    - scan entire relation, O(M)
+    *No index, sorted*
+    - binary search, O(log_2 M)
+
+    Using an index instead can be much faster
+    - clustered/unclustered index
+
+*** Projection
+    1. remove unwanted duplicates
+    2. Eliminated duplicate tuples
+    Sorting should be used, first sort and then remove duplicates in the same run
+    $Cost = O(M \log M)$
+
+    A modified external merge sort is normally used, in step 0 we can directly remove duplicates.
+    Another possible way is to use hashing for the projection, applying recursively when needed.
+
+    In general projection is always /sorting-based/, because in hash case we could:
+    - fail because bucket too big
+    - hashing is sensitive to data distribution
+    - sorting makes the output sorted
+    - already specialized code exists
+
+*** Join
+    Given the query $R \Join_{i=j} S$
+    Easiest way is to use a simple nested loop algorithm, very inefficient in many cases.
+    For each tuple in R we must scan the inner tuples in S.
+    So it's important to put *bigger relations in the outer loop*.
+    
+    *Page oriented nested loop*:
+    For each page of R, we get each page of S, and write out the matching tuples on <r,s> where r is in R-page and S in S-page.
+
+    *Index nested loop join*:
+    Put an index on the join column of one relation and make it the inner relation (to exploit the speed)
+    
+    
+    *Block oriented nested loop*:
+    Cost: Scan of outer + #outer blocks * scan of inner
+    
+    *Sort merge join*:
+    - Sort R and S on the join column, then do a merge while keeping both tables aligned
+    
+    So R is scanned once, each S is scanned once per matched tuple.
+    So we get $M\log M + N\log N + (M + N)$
+    In practice the cost is linear.
+
+    *Hash join*:
+    3(M + N)
+
+*** Set operations
+    Intersection and cross-product are special cases of join.
+    We can use a /sorting based approach/ (a simple sort and merge) or a /hash based approach/ (hash function on tables and union discarding duplicates) to union.
+
+*** Aggregate relations
+    In general they require scanning the relation entirely.
+
+** Query optimization
+   $Query \rightarrow parsing \rightarrow optimization \rightarrow execution \rightarrow storage system$
+   In general we use heuristics to find the best access plan
+
+*** Join ordering
+    "Database the complete book" contains many informations about it.
+    Join cost depends on the order, but the final result will always be the same (for associativity of join operator).
+    In join we should use the smaller relation as outer relation, indexing on the inner relation can exploit it.
+
+    Most DBMS chose a left-deep plan, associating to the left.
+
+*** Possible heuristics
+    1. size of intermediate relations
+    2. selections should be pushed down in the tree (even if in some cases it's not better)
+    3. most restrictive joins first
+    4. postpone joining of large relations
 
 * Deductive database
 ** Intro
    Some queries can't be expressed by SQL or RA, for example:
    - Give me a list of all known ancestors of "John Doe"
    (Recursion is needed in those cases)
+   Prolog allow function symbols as argument of predicate while datalog does not.
+
+   Example:
+#+begin_src prolog
+empl(1, 'jim', 100).
+empl(2, 'brad', 200).
+
+manager(1, 10).
+manager(2, 10).
+
+%% find the employers with the same manager
+same_manager :- empl(X, _, _), empl(Y, _, _), X /= Y, manager(X, Z), manager(Y, Z).
+#+end_src
+
+** Definition
+   A deductive database consists of
+   - Facts F
+   - Rules R
+   - Integrity constraints IC
+   - Explicit and implicit (derived) facts F*
+   D = (F, R)
+
+   Then we have to consider separately the cases in which negation/recursion are allowed/not allowed.
+
+** Herbrand model
+   F* is the minimal Herbrand model of D.
+   A minimal model does not properly contain any other model.
+
+** F* derivation in  NR-datalog
+   The minimal Herbrand model is obtained through repeated application of T_D starting from F using rules R. \\
+   T_D(T_D..(F))
+   F* is created by /naive/ application of this procedure.
+
+** F* derivation in DATALOG\not programs
+   Recursion in this case make it possible to apply more than once T_D per layer.
+   Allowing negation in datalog programs can lead to not unique /minimal Herbrand models/.
+   Given for example
+   $p(X) :- s(X, Y), NOT t(Y)$
+   Doesn't specify how Y could be, and everything different from a constant where t holds could generate a minimal Herbrand model.
 
 ** Elements
    The elements are
@@ -562,6 +731,14 @@
      schema + integrity constraints
    - Interpretation:
      database state
+
+# write here more proofs and Herbrand models explanations
+
+** Intentional database
+   Intentional database (IDB) can be defined by a system of algebraic equations where:
+   - variables for each relation respectively names of predicates
+   - Translate rule bodies into algebraic expressions
+   - All rules for a derivable relation are summarized by unions.
    
 ** Semantics of a deductive database
    A deductive database D = (F, R)
@@ -577,7 +754,57 @@
    - Forward/generation/bottom up (databases):
      Finite sequence of algebraic manipulations, but possibly large unnecessary results
 
-* Some remarks
-  - natural join \Join take the pair that agree in whatever attribute of the schema.
-  - \theta Join force us to set a condition, $R \Join_C R$
-  - /functional dependencies/ (pag 67) 
+** Bottom up
+   Generate facts at evaluation time, it's a direct implementation of least fixed point computation.
+   Many irrelevant facts are also generated, because we generate *all* possible facts and then set up connections only on some of them.
+
+   A possible improvement would be to generate a meta relation query_ which reflects top-down processing.
+
+** Top down
+   Generation of subquerys until facts are reached (proving or disproving), may not terminate.
+   Backtracking to choice point gives the final answer.
+
+   A way to make top-down approach faster would be to store subqueries and answers (dynamic programming approach).
+
+** Integrity constraints
+   Are conditions that have to be satisfied by the database at any point in time.
+
+* Internet and database systems
+  
+** Services of a distributed system
+   - remote database access
+   - distribution transparency
+   - concurrency control and recovery
+   - homogeneous/heterogeneous systems
+
+   RDA defines interoperability of systems, allowing different systems to cooperate on the same database remotely.
+   RDA defines how the final server/client connection happens.
+
+   Transaction management in a distributed system is more complicated, every RM must satisfy a DO-UNDO-REDO protocol.
+   - DO: execute operations and records them in log file
+   - UNDO: reconstruct object given the log file
+   - REDO: reconstruct object from old object state and the log entry
+
+*** Two-phase commit
+    - Phase1:
+      ask participators of a transaction whether they agree on a commit
+    - Phase2:
+      execute commit if all participators agree.
+    - when they've all agreed the transaction is called "prepared".
+      
+    Possible failing reasons:
+    - confirm of a "cancel" operation
+    - integrity tests, if failing the commit is denied.
+
+    Commits can be /eager/ or /lazy/, in case of lazy commits a crash could still violate the "durability" in ACID.
+
+
+**** 2-phase commit in the distributed case
+     It has distributed  transaction managers and managed by a central coordinator.
+     Distributed commit:
+     - localprepare
+     - distribute prepare
+     - commit step
+     - complete step
+
+     We also need a query coordinator that tells when the commits are feasible.
