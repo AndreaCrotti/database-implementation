@@ -1,7 +1,10 @@
-#+OPTIONS: toc:nil num:nil
-* Exam study
+#+OPTIONS: toc:t
+#+EXPORT_EXCLUDE_TAGS: private
+DATABASE IMPLEMENTATION SUMMARY
+
+* Exam study                                                        :private:
   - see exercises an theory about [[file:references/Aries.pdf][ARIES]].
-  - understand how to to the query graphs (from older assignments)
+  - understand how to to the query graphs (from der assignments)
   - check if DPNF could be asked
   - see what a B+tree clustered mean
   - do correctly computations on cost and I/O operations needed
@@ -10,6 +13,7 @@
   - review calculations about costs of operations in [[file:exercises/solutions/Solution%20Exercise6_WS0910.ppt][solution6]]
   - see how hash join works
   - from tableaux to domain calculus and vice-versa
+  - check two phase locking in abort case, [[file:exercises/solutions/Solution%20Exercise3.pdf][sol3]]
 
 * Possible questions
   - B+Trees, operations and advantages
@@ -30,19 +34,20 @@
   - Dirty read: \\
     reading a value given by an aborted transaction
   - Non repeatable/inconsistent read: \\
-    one process read from a variable after other processes have worked on it
+    Two different read values for the same variable in the schedule.
   - Phantom problem: \\
-    solved only with index locking or an higher locking mechanism
+    Insertion or deletions during other actions can create phantoms.
+    This can only be solved by higher order locks.
 
   Thus we need a recovery control and a smart scheduler that satisfies the ACID principles.
   Serializability and recoverability are two different ways to classify our schedules.
 
 ** ACID
    Every transaction must be processed in a way that those principles are satisfied.
-   - Atomicity
-   - Consistency
-   - Isolation
-   - Durability
+   - Atomicity (a transaction can be rolled back)
+   - Consistency (database state is always left consistent)
+   - Isolation (transactions are isolated and don't interfere)
+   - Durability (data stored in a durable way)
 
 ** Read/Write model
    A transaction is a finite set of read write operations on objects x, where x is a database object. \\
@@ -61,7 +66,7 @@
     $H[s] : D \rightarrow HI$
     Where HU is the Herbrand universe.
     
-*** Final State Serializability
+*** FSR (final state serializability)
     Let $s$ and $s'$ be schedules, they are called *finite-state equivalent* if
     $op(s) = op(s')$ and $H[s] = H[s']$ are valid.
     Therefore $s \equiv s'$
@@ -77,13 +82,23 @@
     Reads before writing are in relations with *t_0* and write before the end are in relation with $t_\infty$.
 
     FSR is the class of all /finite-state-serializable/ schedules.
-    But the test for inclusion in FSR has *exponential complexity*, so is not well suitable for analysis.
+    But the test for inclusion in FSR has *exponential complexity*, so is not well suitable 
 
-*** VSR
+*** VSR (View state serializability)
     A serial schedule is schedulable if it is equivalent to serializable schedule such that. \\
     RF(s') = RF(s3), op(s') = op(s3) are holding.
 
-*** Conflicts
+    To find out if $s \in VSR$ we need to compute the /Read From Relations/ between transactions and see if they are conflicting.
+    
+    For example given the transaction: \\
+    s3 = w_2(y) r_3(y) w_3(z) r_2(z) r_2(x) w_1(y) w_1(z) c_1 c_2 c_4
+    The READ-FROM relations are: \\
+    $(t0, y, t3), (t2, z, t3), (t2, x, t0), (t1, y, t_\infty), (t1, z, t_\infty)$
+    
+    Where the underlined relations are dead, since they're not useful for $t_\infty$ (also using the transitive property).
+    
+
+*** CSR (conflict state serializability)
     Two actions are in *conflict* if they operate on the same object and at least one is a write. \\
     - $r1(x) w1(x) \rightarrow$ conflict
     - $w1(x) w2(x) \rightarrow$ conflict
@@ -92,7 +107,7 @@
     - $op(s) = op(s')$
     - $conf(s) = conf(s')$
       
-    They are /conflict-equivalent/ if they can be turned one into the other by a sequence of nonconflicting swaps of adjacent actions.
+    They are /conflict-equivalent/ if they can be turned one into the other by a sequence of non conflicting swaps of adjacent actions.
 
     A schedule is /conflict serializable/ if it is conflict-equivalent to a serializable schedule (swapping all the actions should lead to a serializable schedule).
     Testing for membership to CSR can be done in polynomial time.
@@ -128,36 +143,36 @@
   We need to be able to make sure we can go back to the starting point from an aborted transaction (for example).
   
   In order of strictness we have \\
-  $REC \subset ACA \subset STRICT \subset RIGOROUS$
+  $RIGOROUS \subset STRICT \subset ACA \subset REC$
   Strict schedules solve WW and WR conflicts, while Rigorous schedules also solve the RW conflict (less dangerous).
 
 ** Recoverability
    Every transaction will not be released, until all the other transactions from which it has read, are released
    RC is the class of all recoverable schedules.
    
-   In other words we can say that if we read from another transaction we must make sure that the other transction does the commit before us.
+   In other words we can say that if we read from another transaction we must make sure that the other transaction does the commit before us.
    For example.
-   - $s1 = w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) c2 w1(z) c1 \notin RC$
-   - $s2 = w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) w1(z) c1 c2 \in RC$
+   - s_1 = w_1(x) w_1(y) r_2(u) w_2(x) r_2(y) w_2(y) c_2 w_1(z) c1 $\notin RC$
+   - s_2 = w_1(x) w_1(y) r_2(u) w_2(x) r_2(y) w_2(y) w_1(z) c1 c2 $\in RC$
 
-   Because t2 reads from t1 on y and c2 commits before c1.
+   Because t_2 reads from t_1 on y and c2 commits before c1.
    
 ** Avoidance of cascading aborts
    Recoverability does not suffice in some situations, because the values restored after an abort, may be different from the before image. \\
    So we need to rollback aborted transactions *and* redo committed transactions.
    A transaction is only allowed to read values from already successfully completed transactions.
 
-   - $s2=w1(x) w1(y) r2(u) w2(x) r2(y) w2(y) w1(z) c1 c2 \notin ACA$
-   - $s3=w1(x) w1(y) r2(u) w2(x) w1(z) c1 r2(y) w2(y) c2 \in ACA$
+   - s_2 = w_1(x) w_1(y) r_2(u) w_2(x) r_2(y) w_2(y) w_1(z) c_1 c_2 $\notin ACA$
+   - s_3 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c1 r_2(y) w_2(y) c_2 $\in ACA$
 
-   Here t2 tries to read y before t1 (who wrote on it) has committed.
+   Here t_2 tries to read y before t_1 (who wrote on it) has committed.
    
 ** Strictness
    A schedule is strict, if an object is not read or overwritten, until the transaction, which has written it at last, is terminated.
    Not able to mix different transactions in this way.
    
-   - $s3 =w1(x) w1(y) r2(u) w2(x) w1(z) c1 r2(y) w2(y) c2 \notin ST$
-   - $s4 =w1(x) w1(y) r2(u) w1(z) c1 w2(x) r2(y) w2(y) c2 \in ST$
+   - s_3 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c_1 r_2(y) w_2(y) c_2 $\notin ST$
+     - s\_4 = w_1(x) w_1(y) r_2(u) w_1(z) c_1 w_2(x) r_2(y) w_2(y) c_2 $\in ST$
    Here t2 was trying to write on x before t1 (who wrote x for last) terminated.
    Another way to check is checking that after every write operation the corresponding transaction is terminated.
 
@@ -189,7 +204,7 @@
     A locking protocol is /two phase/ if:
     After the first unlocking operation, locking can't be set anymore.
     In the first phase of the transaction locks will only be set, in the second phase will only be removed.
-    The cycle of locking/unlocking is restarted after every commit operation.
+    Locks must be removed as soon as possible.
     
     - easy to implement
     - good performances
@@ -220,10 +235,35 @@
      
      That's why there are also other ways to manage the locking
 
-
 **** Solving
-     Given a schedule if you're not able find a schedule because the locks are interfering you can *abort* and restart.
-     This will make it able to commit other transactions that are interfering.
+     When no other locks can be set and you can't go forward you get a *deadlock*.
+     In that case you have to abort the transaction with the smallest index and restart it only when other interfering transactions have committed.
+     *Example*:
+     s = r_1(x) w_1(x) r_3(x) w_3(x) c_3 r_2(x) w_2(x) w_2(x) c_2 a_1
+     We have the sequence
+     - rl_1(x)
+     - r_1(x)
+     - rl_2(x)
+     - r_2(x)
+     - *a1*, here ew can't set a write lock on x and if we unlock first we can't set other locks later
+     - wl_2(x), we go directly after the first commit, and can't unlock before c_2 is committed
+     - w_2(x)
+     - c_2
+     - wu_2(x), finally unlocking it
+     - wl_3(x)
+     - w_3(x)
+     - c3
+     - wu_3(x)
+     - wl_4(x)
+     - w_4(x), unlock only after c_4 is committed
+     - c_4
+     - wu_4(x)
+     - rl_1(x), here finally we have the restart of the aborted transaction
+     - r_1(x)
+     - wl_1(x)
+     - w_1(x)
+     - c1
+     - w_u1(x)
 
 *** MGL
      We need *intentional locks*.
@@ -243,6 +283,12 @@
      To be able to apply locks on one tree we must first have acquired an /intentional lock/.
      And you can't remove an intentional lock until you have a lock on one child node, the locks are set top-down and removed bottom-up.
 
+     Each transaction is locked/unlocked as follows:
+     1. x not root, t_i must own a ir- or iw- lock on the parent node to set a rl- or irl- lock
+     2. x not root, t_i must own a iw lock on the parent to be able to set a wl- or iwl- lock
+     3. to read (write) x, t_i must own a r- or w-lock on a child of x
+     4. t_i can't remove an intentional lock on x, as long as t_i has still a lock on a child of x.
+
      A transaction can only hold *one* lock on an object, this are the possible updates
 #+begin_src dot :file ilocks.pdf :cmdline -Tpdf :exports none :results silent
      digraph G {
@@ -256,13 +302,14 @@
      
      [[file:ilocks.pdf]]
 
-**** Example
-     Read records Page 1200:5
-     - irl(D)
-     - irl(F2)
-     - irl(P1200)
-     - rl(P1200:5)
-
+**** Compatibility table
+     |      | rl | wl | irl | iwl | riwl |
+     | rl   | +  | -  | +   | -   | -    |
+     | wl   | -  | -  | -   | -   | -    |
+     | irl  | +  | -  | +   | +   | +    |
+     | iwl  | -  | -  | +   | +   | -    |
+     | riwl | -  | -  | +   | -   | -    |
+       
 *** Index locking
     Assuming insertions also S2PL could fail (phantom problem for example).
     Conflict serializability is only guaranteed as long as we don't add objects.
@@ -401,16 +448,16 @@
     Undoes all the transactions that were active (but didn't commit) at the moment of crash.
     
 
-* b+Trees
+* B+Trees
   The /order/ of a B+Tree is defined as capacity of the nodes (number of children nodes) in the tree.
   For example a b+tree of order 2 can have a max of 2 values for every node which mean 3 subpointers. \\
   A particular tree structure where the data is only storead in the leaves.
   Particulary well suited for search, there also is a link between the leaves.
 
   For example given a possible given a key node of order 2 [A | B] it can have 3 children where:
-  - [x < A]
-  - [A <= x < B]
-  - [x >= B]
+  - $x < A$
+  - $A <= x < B$
+  - $x >= B$
   
 ** Insertion
    - do a search to determine what bucket the new record should go in
@@ -507,10 +554,10 @@
    - equality:
      $F = \frac{1}{V(R,y)}$
    - range selection:
-     $F = \frac{min(R,y)}{max(R,y) - min(R,y)}$
-     where max and min are the maximum and minimum values
+     + $\sigma_{y > k}$: $F = \frac{max(R,y) - k}{max(R,y) - min(R,y)}$
+     + $\sigma_{y < k}$: $F = \frac{k - min(R,y)}{max(R,y) - min(R,y)}$
    - join (on 2 relations):
-     $1 / max(V(S,y), V(R,y))$
+     $\frac{1}{max(V(S,y), V(R,y))}$
 
 ** Query representation
    - Tuple relational calculus
@@ -535,7 +582,7 @@
     - Intersection
     - Difference
 
-    For example, names of the dependents with one son and salary > 10000
+    For example, names of the dependents with one son and salary > 10000: \\
     $\pi_{name}((\sigma_{sons = 1} SONS) \Join (\sigma_{salary > 10000} DEPS))$
     
     Moreover we have defined:
@@ -548,7 +595,7 @@
     Domain variables $x_i \in Dom$ represents attributes.
     Predicates:
     - Atomic predicates
-    - $\not A$ ..
+    - $\neg A$
     - $\forall x_i A$
     - $\exists x_i A$
 
@@ -571,7 +618,26 @@
 
 ** Implementation of relational operators
    Relational operators are implemented to be as fast as possible using buffers and other available structures given by the DBMS.
-   
+
+*** Summary table
+    - N : pages external relation
+    - M : pages internal relation
+    - B : # of buffers available
+    General costs for various opertions:
+    
+    | METHOD                      | COST                                     |
+    |-----------------------------+------------------------------------------|
+    | GENERAL MERGE SORT          | $2N \cdot (1 + \log_{B-1}(\frac{N}{B}))$ |
+    | SELECTION(no index)         | $O(M)$                                   |
+    | SELECTION(no index, sorted) | $O(\log_2 M)$                            |
+    | PROJECTION (sorting)        | $O(M \log M)$                            |
+    | PROJECTION (hashing)        | $B - 1$ partitions                       |
+    | JOIN (simple nested)        | $M + pr \cdot M \cdot N$                 |
+    | JOIN (block nested)         | $M + (\frac{M}{B-2}) \cdot N$            |
+    | JOIN (index nested)         | $M + ((M \cdot pr) \cdot$ cost finding S |
+    | HASH JOIN                   | $3 (M + N)$                              |
+    | SORT MERGE                  | $M\log M + N\log N + (M + N)$            |
+    
 *** Sorting
     - Normally data are requested in order
     - Sorting is useful for building B+tree index
