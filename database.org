@@ -503,7 +503,6 @@ digraph G {
 
 *** Multilevel indexes using B-Trees and B^{+}-Trees
     
-
 * Query evaluation
   In genernal a select would be translated to an innested loop, possible ways to improve:
   - selection before join (makes the tables to join smaller)
@@ -532,7 +531,6 @@ digraph G {
 
 *** Two passes
     Two pass are usually enough for anything, partitioning into acceptable size, sort and hash.
-
 
 ** Access planning
    The access plan is important to get the maximum possible speed.
@@ -570,13 +568,40 @@ digraph G {
    - Tuple relational calculus
    - Relational algebra
    - Domain calculus
-   - DPNF
 
 *** Tuple relational calculus
     A query is in the form:
     {<goal list> OF EACH r_1..., EACH r_n in R_n: /selection predicate/}
     We can have different possibilities for selecting, from normal boolean conditions to join on other lists for some attributes.
     /SOME/ and /ALL/ are the quantifiers used for testing.
+    
+    *Example*:
+#+begin_src sql
+    [<e.name OF EACH e IN EMPL:
+             ALL e IN EMPL (e.salary < 40000 OR e.dno != d.dno)]
+#+end_src
+
+*** Domain relational calculus
+    Domain variables $x_i \in Dom$ represents attributes.
+    Predicates:
+    - Atomic predicates
+    - $\neg A$
+    - $\forall x_i A$
+    - $\exists x_i A$
+
+    *Facts*:
+    Atomic predicates with possible universal quantified variables
+    *Rules*:
+    Disjunctive Horn clauses.
+
+# *Example*:
+# {Ename \in NameType | \\
+#     \Exist Eno \in Enotype, \\
+#     \Exist Sal \in {10000..90000}, \\
+#     \Exist Dno \in Dnotype, \\
+#     \Exist Mgr \in Enotype (EMPL(Eno, Ename, 'single', Sal, Dno) \wedge \\
+#                            DEPT(Dno, 'computer', Mgr) \wedge \\
+#                            Sal < 40000)}
 
 *** Relational algebra
     A /relational complete/ language is able to express all queries expressible by RA.
@@ -590,6 +615,7 @@ digraph G {
     - Difference
 
     For example, names of the dependents with one son and salary > 10000: \\
+
     $\pi_{name}((\sigma_{sons = 1} SONS) \Join (\sigma_{salary > 10000} DEPS))$
     
     Moreover we have defined:
@@ -597,20 +623,8 @@ digraph G {
     - natural join (equal in their common attribute name)
     - semi-join (there is A couple in S with the equal attribute)
     - \theta-join, equi-join (join with a condition of = or <> on one attribute)
-
-*** Domain relational calculus
-    Domain variables $x_i \in Dom$ represents attributes.
-    Predicates:
-    - Atomic predicates
-    - $\neg A$
-    - $\forall x_i A$
-    - $\exists x_i A$
-
-    Facts:
-    Atomic predicates with possible universal quantified variables
-    Rules:
-    Disjunctive Horn clauses.
     
+*** Tableaux calculus
     There is a close relation with Domain calculus and tableau representation.
     A tableaux can be optimized finding the minimal outcome of all equivalent tableaux.
 
@@ -849,7 +863,6 @@ same_manager :- empl(X, _, _), empl(Y, _, _), X /= Y, manager(X, Z), manager(Y, 
    Are conditions that have to be satisfied by the database at any point in time.
 
 * Internet and database systems
-  
 ** Services of a distributed system
    - remote database access
    - distribution transparency
@@ -876,7 +889,6 @@ same_manager :- empl(X, _, _), empl(Y, _, _), X /= Y, manager(X, Z), manager(Y, 
     - integrity tests, if failing the commit is denied.
 
     Commits can be /eager/ or /lazy/, in case of lazy commits a crash could still violate the "durability" in ACID.
-
 
 **** 2-phase commit in the distributed case
      It has distributed  transaction managers and managed by a central coordinator.
