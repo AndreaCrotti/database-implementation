@@ -559,6 +559,10 @@ DATABASE IMPLEMENTATION SUMMARY
    - join (on 2 relations):
      $\frac{1}{max(V(S,y), V(R,y))}$
 
+*** Estimation rate
+    Given one theoretical estimation (for example using standard distribution) and a concrete estimation we can compute the accuracy with.
+    $\frac{|est_1 - est_2|}{est_2} \times 100$ %
+
 ** Query representation
    - Tuple relational calculus
    - Relational algebra
@@ -623,6 +627,7 @@ DATABASE IMPLEMENTATION SUMMARY
     - N : pages external relation
     - M : pages internal relation
     - B : # of buffers available
+    - pr : number of tuples in one page
     General costs for various opertions:
     
     | METHOD                      | COST                                     |
@@ -633,6 +638,7 @@ DATABASE IMPLEMENTATION SUMMARY
     | PROJECTION (sorting)        | $O(M \log M)$                            |
     | PROJECTION (hashing)        | $B - 1$ partitions                       |
     | JOIN (simple nested)        | $M + pr \cdot M \cdot N$                 |
+    | JOIN (page nested)          | $M + M \cdot N$                          |
     | JOIN (block nested)         | $M + (\frac{M}{B-2}) \cdot N$            |
     | JOIN (index nested)         | $M + ((M \cdot pr) \cdot$ cost finding S |
     | HASH JOIN                   | $3 (M + N)$                              |
@@ -698,8 +704,8 @@ DATABASE IMPLEMENTATION SUMMARY
     For each page of R, we get each page of S, and write out the matching tuples on <r,s> where r is in R-page and S in S-page.
 
     *Index nested loop join*:
-    Put an index on the join column of one relation and make it the inner relation (to exploit the speed)
-    
+    Put an index on the join column of one relation and make it the inner relation (to exploit the speed).
+    The cost of finding the tuple depends on the height of the B+tree.
     
     *Block oriented nested loop*:
     Cost: Scan of outer + #outer blocks * scan of inner
@@ -712,7 +718,11 @@ DATABASE IMPLEMENTATION SUMMARY
     In practice the cost is linear.
 
     *Hash join*:
-    3(M + N)
+    Partition both relations using hash function h.
+    Read in a partition of R, hash it using h2 (different hashing functions).
+    - In partitioning phase: read write both 2(M + N)
+    - In matching phase: read both (M + N)
+    $3(M + N)$
 
 *** Set operations
     Intersection and cross-product are special cases of join.
