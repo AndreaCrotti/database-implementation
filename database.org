@@ -25,12 +25,40 @@ DATABASE IMPLEMENTATION SUMMARY
   - tableaux
   - datalog (fix point...)
   - distributed database, 2-phase commit, semijoin
+    
+* B+Trees
+  The /order/ of a B+Tree is defined as capacity of the nodes (number of children nodes) in the tree.
+  For example a b+tree of order 2 can have a max of 2 values for every node which mean 3 subpointers. \\
+  A particular tree structure where the data is only storead in the leaves.
+  Particulary well suited for search, there also is a link between the leaves.
+
+  For example given a possible given a key node of order 2 [A | B] it can have 3 children where:
+  - $x < A$
+  - $A <= x < B$
+  - $x >= B$
+  
+** Insertion
+   - do a search to determine what bucket the new record should go in
+   - if the bucket is not full, add the record.
+   - otherwise, split the bucket.
+   - allocate new leaf and move half the bucket's elements to the new bucket
+   - insert the new leaf's smallest key and address into the parent.
+   - if the parent is full, split it also
+   - now add the middle key to the parent node
+   - repeat until a parent is found that need not split
+   - if the root splits, create a new root which has one key and two pointers.
+
+** Characteristics
+   Given a B+Tree of order /b/ and height /h/
+   - max number of records stored: n = b^h (only the leaves count)
+   - space required to store the tree: $O(n)$
+   - inserting a record: $O(\log_b{n})$
+   - performing a range query with k elements: $O(log_b{n} + k)$
 
 * Transactions
   Transactions can be simplified with the *read/write* model, we could have for example those synchronization problems:
   - Lost update: \\
-    writing after writing interleaving actions.
-    For example T1 reads, T2 updates and T1 writes again, the update done by T2 is then lost.
+    Losing the effect of an update overwriting it just after
   - Dirty read: \\
     reading a value given by an aborted transaction
   - Non repeatable/inconsistent read: \\
@@ -57,13 +85,33 @@ DATABASE IMPLEMENTATION SUMMARY
    A shuffle is one of the possible permutations of the execution order (also called *complete schedule*).
 
 ** Serializability
+   It holds:
+   $CSR \subset VSR \subset FSR$
+    
+*** Read From
+    /Read From/ relation is given when $p \rightarrow q$, so the action p is read in q.
+    An action p is /directly useful/ ($p \rightarrow q$) if q is read from p or p is read and q consecutive write action.
+    
+*** Alive
+    An action is /alive/ if it's useful for some other actions in the future.
+    For example: \\
+    $\{(t_0, x, t_1), (t_1, y, t_2), (t_2, z, t_\infty)\}$
+    Means that t_2 is alive, t_1 is alive since it's useful for t_2 and t_0 is alive since it's useful for t_1.
+    
+*** Live reads from
+    /Live-reads-from/ relation is done by all the tuples (t_x, <var>, t_y) which are in a read from relation. \\
+    Reads before writing are in relations with *t_0* and write before the end are in relation with $t_\infty$.
+
+    FSR is the class of all /finite-state-serializable/ schedules.
+    But the test for inclusion in FSR has *exponential complexity*, so is not well suitable 
+
 *** Semantics of a schedule
     For every schedule we can compute its semantic (the meaning), in short.
     - H_s(ri(x)): semantic of the last write
     - H_s(wi(x)): semantic given by a function applied on all the previous reads in the transaction on that argument.
     
     The schedule is then a mapping in the form \\
-    $H[s] : D \rightarrow HI$
+    $H[s] : D \rightarrow HU$
     Where HU is the Herbrand universe.
     
 *** FSR (final state serializability)
@@ -72,17 +120,6 @@ DATABASE IMPLEMENTATION SUMMARY
     Therefore $s \equiv s'$
 
     We can't determine it by simply the last state but also by previous write operations, also the previous write operations must be taken into account.
-    
-    *Read from* relation is given when $p \rightarrow q$, so the action p is read in q.
-    An action p is /directly useful/ ($p \rightarrow q$) if q is read from p or p is read and q consecutive write action.
-    
-    Action is *alive* if it's useful for some other actions in the future.
-    
-    *Live-reads-from* relation is done by all the tuples (t_x, <var>, t_y) which are in a read from relation. \\
-    Reads before writing are in relations with *t_0* and write before the end are in relation with $t_\infty$.
-
-    FSR is the class of all /finite-state-serializable/ schedules.
-    But the test for inclusion in FSR has *exponential complexity*, so is not well suitable 
 
 *** VSR (View state serializability)
     A serial schedule is schedulable if it is equivalent to serializable schedule such that. \\
@@ -95,13 +132,10 @@ DATABASE IMPLEMENTATION SUMMARY
     The READ-FROM relations are: \\
     $(t0, y, t3), (t2, z, t3), (t2, x, t0), (t1, y, t_\infty), (t1, z, t_\infty)$
     
-    Where the underlined relations are dead, since they're not useful for $t_\infty$ (also using the transitive property).
-    
-
 *** CSR (conflict state serializability)
     Two actions are in *conflict* if they operate on the same object and at least one is a write. \\
-    - $r1(x) w1(x) \rightarrow$ conflict
-    - $w1(x) w2(x) \rightarrow$ conflict
+    - r1(x) w1(x) $\rightarrow$ conflict
+    - w1(x) w2(x) $\rightarrow$ conflict
     
     $s$ and $s'$ are *conflict equivalent* if
     - $op(s) = op(s')$
@@ -120,24 +154,10 @@ DATABASE IMPLEMENTATION SUMMARY
      - A_1 and A_2 involve the same element
      - At least one is a write action
 
-     With those information we can write a graph and
-     graph is cyclic -> the schedule is not conflict serializable.
-     
-**** Serializability theorem:
-    It holds
-    $CSR \subset VSR \subset FSR$
-    We can then build a simple conflict graph and say that.
-    $s \in CSR \leftrightarrow G(s)$ is acyclic
-    
-    So we can check in polynomial time the conflict serializability.
-
-**** Order preserving conflict serializability
-     We can impose constraints on CSR imposing that some actions must be executed later.
-     An /ordering/ of the conflict order is sufficient for /conflict serializability/.
-     
+     With those information we can write a graph and graph is *cyclic* then the schedule is not conflict serializable.
 * Transaction recovery
   Serializability does not avoid synchronization problems between processes.
-  Recovery properties are orthogonal to serializability.
+  Recovery properties are *orthogonal* to serializability.
 
   Under which conditions a schedule allows a *correct recovery of transactions*? \\
   We need to be able to make sure we can go back to the starting point from an aborted transaction (for example).
@@ -160,26 +180,24 @@ DATABASE IMPLEMENTATION SUMMARY
 ** Avoidance of cascading aborts
    Recoverability does not suffice in some situations, because the values restored after an abort, may be different from the before image. \\
    So we need to rollback aborted transactions *and* redo committed transactions.
-   A transaction is only allowed to read values from already successfully completed transactions.
+   A transaction is in /ACA/ when is only allowed to read values from already successfully completed transactions.
 
-   - s_2 = w_1(x) w_1(y) r_2(u) w_2(x) r_2(y) w_2(y) w_1(z) c_1 c_2 $\notin ACA$
-   - s_3 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c1 r_2(y) w_2(y) c_2 $\in ACA$
+   - s_1 = w_1(x) w_1(y) r_2(u) w_2(x) r_2(y) w_2(y) w_1(z) c_1 c_2 $\notin ACA$
+   - s_2 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c1 r_2(y) w_2(y) c_2 $\in ACA$
 
    Here t_2 tries to read y before t_1 (who wrote on it) has committed.
    
 ** Strictness
-   A schedule is strict, if an object is not read or overwritten, until the transaction, which has written it at last, is terminated.
-   Not able to mix different transactions in this way.
+   A schedule is /strict/, if an object is not read or overwritten, until the transaction, which has written it at last, is terminated.
    
-   - s_3 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c_1 r_2(y) w_2(y) c_2 $\notin ST$
-     - s\_4 = w_1(x) w_1(y) r_2(u) w_1(z) c_1 w_2(x) r_2(y) w_2(y) c_2 $\in ST$
+   - s_1 = w_1(x) w_1(y) r_2(u) w_2(x) w_1(z) c_1 r_2(y) w_2(y) c_2 $\notin ST$
+   - s_2 = w_1(x) w_1(y) r_2(u) w_1(z) c_1 w_2(x) r_2(y) w_2(y) c_2 $\in ST$
    Here t2 was trying to write on x before t1 (who wrote x for last) terminated.
    Another way to check is checking that after every write operation the corresponding transaction is terminated.
 
 ** Rigorous schedules
    A schedule is rigorous, if it is strict and no object x is overwritten, until all transactions, which have read x at last, are terminated
    
-
 * Concurrency Control Protocols
   Techiques thanks to which the DBMS can generate correct schedules.
   They can use locking mechanism or not.
@@ -193,28 +211,29 @@ DATABASE IMPLEMENTATION SUMMARY
    For a schedule s a DT(s) it the projection of s on the actions of type "a,c,r,w".
    (removing the locking and unlocking operations).
    
-   
    - rl(x) read lock
    - wl(x) write lock
 
-   In genernal unlocks don't have to be done immediately after but they must be not redundant.
-   Now some possible implementations of locking protocols.
+   In general unlocks don't have to be done immediately after but they must be not redundant.
      
 *** Two phase locking (2PL)
     A locking protocol is /two phase/ if:
-    After the first unlocking operation, locking can't be set anymore.
-    In the first phase of the transaction locks will only be set, in the second phase will only be removed.
-    Locks must be removed as soon as possible.
+    - In the first phase of the transaction locks will only be set, in the second phase will only be removed.
+    - Locks must be removed as soon as possible.
     
+    PROS:
     - easy to implement
     - good performances
     - easy to distribute
+
+    CONS:
     - *not* deadlock free
     - transactions may starve!
       
+    It's proved that: \\
     $\epsilon(2PL) \subseteq CSR$
 
-    Other possible variants are:
+    Other possible variants of 2PL are:
     - Conservative 2PL:
       All locks available since BOT
     - S2PL:
@@ -223,22 +242,19 @@ DATABASE IMPLEMENTATION SUMMARY
       All locks hold till EOT (too restrictive, transactions should be too short in this case)
 
     Removing a lock is always safer at the end of the transaction, but usually much earlier.
-
     $\epsilon(S2PL) \subseteq CSR \bigcap ST$, the S2PL scheduler is safe.
 
     *Trick*: \\
     Once you have set up a write lock you can also read directly.
     
-**** Disadvantages
+**** Disadvantages of 2PL
      - big locking objects:  a few locks but with many conflicts
      - small locking objects: more concurrency but a higher cost
      
-     That's why there are also other ways to manage the locking
-
-**** Solving
+**** Example
      When no other locks can be set and you can't go forward you get a *deadlock*.
      In that case you have to abort the transaction with the smallest index and restart it only when other interfering transactions have committed.
-     *Example*:
+     Given s: \\
      s = r_1(x) w_1(x) r_3(x) w_3(x) c_3 r_2(x) w_2(x) w_2(x) c_2 a_1
      We have the sequence
      - rl_1(x)
@@ -258,7 +274,7 @@ DATABASE IMPLEMENTATION SUMMARY
      - w_4(x), unlock only after c_4 is committed
      - c_4
      - wu_4(x)
-     - rl_1(x), here finally we have the restart of the aborted transaction
+     - *rl_1(x)*, here finally we have the restart of the aborted transaction
      - r_1(x)
      - wl_1(x)
      - w_1(x)
@@ -275,8 +291,24 @@ DATABASE IMPLEMENTATION SUMMARY
      - riwl:
        current node is read locked but also a write lock will be requested later in the subtree.
 
-     Considering the structure of the database: \\
-     $db \rightarrow Areas \rightarrow files \rightarrow Relations$
+     Considering a database structure like:
+
+#+begin_src dot :file db_struct.pdf :cmdline -Tpdf :exports none :results silent
+digraph G {
+        db -> file1;
+        db -> file2;
+        file1 -> page1;
+        file1 -> page2;
+        file2 -> page9;
+        file2 -> page10;
+        page1 -> record1;
+        page9 -> record100;
+        page10 -> "...";
+        }
+#+end_src
+     
+     [[file:db_struct.pdf]]
+
      We can set up locks with a higher granularity on one particular subtree.
      
      Read lock is also called /shared/ lock, while write lock is /exclusive/.
@@ -321,19 +353,20 @@ DATABASE IMPLEMENTATION SUMMARY
 
 *** Locking in B+Trees
     In B+Trees real data is only contained in the leaf nodes, no information given by the intermediates.
+    A node is safe if changes will not propagate to higher levels of the tree
+    - *insertions*: Node is not full
+    - *deletions*: Node is not half empty
+    
+    Working on the B+Trees involves:
     - Searching
       + go down from root
       + read lock child, unlock parent
     - Insert / delete
       + go down from root
-      + write lock child, then check if safe
-        A node is safe if changes will not propagate to higher levels of the tree
-        - insertions: Node is not full
-        - deletinons: Node is not half empty
+      + write lock child, then check if safe \\
 
     The problem is that there are two many useless write locks, since the data is only phisically stored in the leaves.
-    When locking for a search keep in mind that in the algorithm there is no use of the key value, so we need to lock the subtrees (and also to prevent phantom problems).
-    
+
     *Improved tree locking*:
     Try to lock only the leaf, if not safe backtrack to root and use previous algorithm.
     
@@ -347,7 +380,6 @@ DATABASE IMPLEMENTATION SUMMARY
       Every TA gets a timestamp, if p_i and q_i are in conflict execute p_i before q_i, so it generates conflict serializable schedules.
       It's not more efficient but can be used in distributed systems.
 
-
 ** Concurrency control in SQL
    SQL allows to set up different security levels, for different usages:
    - READ UNCOMMITTED
@@ -356,6 +388,7 @@ DATABASE IMPLEMENTATION SUMMARY
    - SERIALIZABLE
 
    In order of safety and decreasing concurrency allowed.
+   Normally serializable is always used since it's the only one avoiding all the synchronization problems.
 
 * Recovery protocols
   We need to be able to recover from transactions faults.
@@ -446,36 +479,6 @@ DATABASE IMPLEMENTATION SUMMARY
 
 *** UNDO phase
     Undoes all the transactions that were active (but didn't commit) at the moment of crash.
-    
-
-* B+Trees
-  The /order/ of a B+Tree is defined as capacity of the nodes (number of children nodes) in the tree.
-  For example a b+tree of order 2 can have a max of 2 values for every node which mean 3 subpointers. \\
-  A particular tree structure where the data is only storead in the leaves.
-  Particulary well suited for search, there also is a link between the leaves.
-
-  For example given a possible given a key node of order 2 [A | B] it can have 3 children where:
-  - $x < A$
-  - $A <= x < B$
-  - $x >= B$
-  
-** Insertion
-   - do a search to determine what bucket the new record should go in
-   - if the bucket is not full, add the record.
-   - otherwise, split the bucket.
-   - allocate new leaf and move half the bucket's elements to the new bucket
-   - insert the new leaf's smallest key and address into the parent.
-   - if the parent is full, split it also
-   - now add the middle key to the parent node
-   - repeat until a parent is found that need not split
-   - if the root splits, create a new root which has one key and two pointers.
-
-** Characteristics
-   Given a B+Tree of order /b/ and height /h/
-   - max number of records stored: n = b^h (only the leaves count)
-   - space required to store the tree: $O(n)$
-   - inserting a record: $O(\log_b{n})$
-   - performing a range query with k elements: $O(log_b{n} + k)$
 
 * Indexing
   Indexes are used to speed up the retrieval of records in response to certain search conditions.
